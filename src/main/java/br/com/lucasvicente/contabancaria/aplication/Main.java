@@ -1,74 +1,71 @@
 package br.com.lucasvicente.contabancaria.aplication;
 
+import br.com.lucasvicente.contabancaria.entites.Account;
+import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-public class Bank {
+public class Main {
     public static void main(String[] args) {
 
-        Scanner read = new Scanner(System.in);
+        Bank bank = new Bank("lv-bank");
 
-        BigDecimal balance = new BigDecimal("1112.00");
+        Scanner sc = new Scanner(System.in);
+
         boolean verificator;
-        BigDecimal money;
         int comparator, userId = -1, selection;
         byte menuP;
         String actualCpf, confirmPassword, actualPassword, user = "", username, cpf, password, keyPix;
-        Person actualUser = new Person();
-
-        List<Person> users = new ArrayList<>();
+        Account actualAccount = new Account();
 
         do {
         menuP = 0;
         verificator = false;
         System.out.println("Bem vindo ao LV Bank, Possui Cadastro?\n\n1)Sim\n2)Nao\n3)Sair");
-        selection = read.nextInt();
+        selection = sc.nextInt();
 
 
         if (selection == 2) {
 
 
             System.out.println("Digite seu nome:");
-            read.nextLine();
-            username = read.nextLine();
+            sc.nextLine();
+            username = sc.nextLine();
 
             System.out.println("Digite seu cpf:(Obs: somente números) ");
-            cpf = read.next();
+            cpf = sc.next();
 
             do {
                 System.out.println("Digite uma senha:");
-                password = read.next();
+                password = sc.next();
 
                 System.out.println("Confirme a senha:");
-                confirmPassword = read.next();
+                confirmPassword = sc.next();
 
                 if (confirmPassword.equals(password)) {
                     verificator = true;
-                    Person newUser = new Person(username, cpf, password);
-                    users.add(newUser);
+                    Person newUser = new Person(username, cpf);
+                    Account newAccount = new Account(bank,newUser,password, bank.getAccounts().size()+1, "0001");
+                    newUser.addAccount(newAccount);
+                    bank.addAccount(newAccount);
                 } else {
                     System.out.println("Tente novamente");
                 }
 
             } while (verificator == false);
-            verificator = false;
-
 
         } else if (selection == 1) {
 
             System.out.println("Digite o seu cpf:");
-            actualCpf = read.next();
-            for (int i = 0; i < users.size() && verificator == false; i++) {
-                actualUser = users.get(i);
+            actualCpf = sc.next();
+            for (int i = 0; i < bank.getAccounts().size() && verificator == false; i++) {
+                actualAccount = bank.getAccounts().get(i);
 
-                if (actualUser.getCpf().equals(actualCpf)) {
+                if (actualAccount.getPerson().getCpf().equals(actualCpf)) {
                     verificator = true;
-                    userId = i;
-                    user = actualUser.getFullName();
+                    //userId = i;
                 }
             }
 
@@ -77,9 +74,9 @@ public class Bank {
 
             } else {
                 System.out.println("Digite a senha:");
-                actualUser = users.get(userId);
-                actualPassword = read.next();
-                if (actualUser.getPassword().equals(actualPassword)) {
+                //actualAccount = bank.getAccounts().get(userId);
+                actualPassword = sc.next();
+                if (actualAccount.getPassword().equals(actualPassword)) {
                     verificator = true;
                 } else {
                     verificator = false;
@@ -87,7 +84,7 @@ public class Bank {
                 }
             }
             while (verificator == true && menuP != 5) {
-                System.out.printf("Bem vindo(a) %s%n%nEsta é a tela principal do LV Bank, selecione uma das opções abaixo:%n", actualUser.getFullName());
+                System.out.printf("Bem vindo(a) %s%n%nEsta é a tela principal do LV Bank, selecione uma das opções abaixo:%n", actualAccount.getPerson().getFullName());
                 System.out.println(
                                 "1 - verificar saldo\n" +
                                 "2 - efetuar saque\n" +
@@ -95,22 +92,22 @@ public class Bank {
                                 "4 - adicionar saldo\n" +
                                 "5 - Sair"
                 );
-                menuP = read.nextByte();
-                read.nextLine();
+                menuP = sc.nextByte();
+                sc.nextLine();
 
                 switch (menuP) {
                     case 1:
-                        System.out.printf("Saldo disponível: %.2f%n", balance);
+                        System.out.printf("Saldo disponível: %.2f%n", actualAccount.getBalance());
                         break;
                     case 2:
                         System.out.println("informe o valor que deseja  sacar:");
-                        money = read.nextBigDecimal();
-                        comparator = money.compareTo(balance);
+                        BigDecimal money = sc.nextBigDecimal();
+                        comparator = money.compareTo(actualAccount.getBalance());
                         if (comparator > 0) {
                             System.out.println("Valor de saque maior do do que valor disponivel");
 
                         } else {
-                            balance = balance.subtract(money);
+                            actualAccount.withdraw(money);
                             System.out.println("Saque efetuado!");
                         }
                         break;
@@ -120,32 +117,32 @@ public class Bank {
                                 "1)Efetuar Pix\n" +
                                 "2)Cadastrar chave pix\n"
                         );
-                        menuP = read.nextByte();
+                        menuP = sc.nextByte();
                         switch (menuP) {
                             case 1:
                                 System.out.println("Informe a chave pix do destinatário:");
                                 break;
                             case 2:
                                 System.out.print("Chaves cadrastadas: ");
-                                if(actualUser.getKeyPix().size() == 0) {
+                                if(actualAccount.getPixKeys().size() == 0) {
                                     System.out.println(0);
                                 } else {
-                                    System.out.println(actualUser.getKeyPix().size());
-                                    for (int i = 0; i < actualUser.getKeyPix().size(); i++){
-                                        System.out.printf("Chave %d: %s%n",i+1,actualUser.getKeyPix().get(i));
+                                    System.out.println(actualAccount.getPixKeys().size());
+                                    for (int i = 0; i < actualAccount.getPixKeys().size(); i++){
+                                        System.out.printf("Chave %d: %s%n",i+1,actualAccount.getPixKeys().get(i));
                                     }
                                 }
                                 System.out.println("Informe a chave pix para cadastrar:");
-                                keyPix = read.next();
-                                actualUser.addKeyPix(keyPix);
+                                keyPix = sc.next();
+                                actualAccount.addPixKey(keyPix);
                                 System.out.println("Chave cadastrada com sucesso!");
                                 break;
                         }
                         break;
                     case 4:
                         System.out.println("Informe o valor que será adicionado na conta:");
-                        money = read.nextBigDecimal();
-                        balance = balance.add(money);
+                        money = sc.nextBigDecimal();
+                        actualAccount.depostit(money);
                         System.out.println("Valor adicionado!");
                         break;
                     case 5:
@@ -159,7 +156,7 @@ public class Bank {
             }
         }
         } while (selection != 3);
-            read.close();
+            sc.close();
             System.out.println("Obrigado por usar o LV Bank!");
 
     }

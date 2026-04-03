@@ -1,48 +1,45 @@
 package br.com.lucasvicente.contabancaria.entites;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Person {
     private String fullName;
     private String cpf;
-    private String password;
-    private List<String> keyPix;
+    private List<Account> accounts = new ArrayList<>();
 
-
-    public Person(String fullName, String cpf, String password) {
+    public Person(String fullName, String cpf) {
         this.fullName = fullName;
         this.cpf = cpf;
-        this.password = password;
-        this.keyPix = new ArrayList<>();
     }
 
     public Person(){
 
     }
 
-    // Getters
+
     public String getFullName() {
-        return fullName; }
-    public String getCpf() {
-        return cpf; }
-    public String getPassword() {
-        return password; }
-    public List<String> getKeyPix() {
-        return keyPix;
+        return fullName;
     }
 
-    // Setters
     public void setFullName(String fullName) {
-        this.fullName = fullName; }
+        this.fullName = fullName;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
     public void setCpf(String cpf) {
-        this.cpf = cpf; }
-    public void setPassword(String password) {
-        this.password = password; }
+        this.cpf = cpf;
+    }
 
+    public List<Account> getAccounts() {
+        return accounts;
+    }
 
-
-    public void addKeyPix(String key) {
-        keyPix.add(key);
+    public void addAccount (Account account) {
+        this.accounts.add(account);
     }
 }

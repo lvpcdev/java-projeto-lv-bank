@@ -1,23 +1,34 @@
 package br.com.lucasvicente.contabancaria.aplication;
 
+import br.com.lucasvicente.contabancaria.controller.PersonController;
+import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+
+
+
+    private static final PersonController personController = new PersonController();
+
+    public static void main(String[] args) throws SQLException {
+        DatabaseConnection.startDataBase();
+        org.h2.tools.Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
+
 
         Bank bank = new Bank("lv-bank");
 
         Scanner sc = new Scanner(System.in);
 
         boolean verificator;
-        int comparator, userId = -1, selection;
+        int comparator, selection;
         byte menuP;
-        String actualCpf, confirmPassword, actualPassword, user = "", username, cpf, password, keyPix;
+        String actualCpf, confirmPassword, actualPassword, username, cpf, password, keyPix;
         Account actualAccount = new Account();
 
         do {
@@ -46,8 +57,9 @@ public class Main {
 
                 if (confirmPassword.equals(password)) {
                     verificator = true;
-                    Person newUser = new Person(username, cpf);
+                    Person newUser = new Person(null, username, cpf);
                     Account newAccount = new Account(bank,newUser,password, bank.getAccounts().size()+1, "0001");
+                    personController.insert(username,cpf);
                     newUser.addAccount(newAccount);
                     bank.addAccount(newAccount);
                 } else {
@@ -65,7 +77,6 @@ public class Main {
 
                 if (actualAccount.getPerson().getCpf().equals(actualCpf)) {
                     verificator = true;
-                    //userId = i;
                 }
             }
 
@@ -74,7 +85,6 @@ public class Main {
 
             } else {
                 System.out.println("Digite a senha:");
-                //actualAccount = bank.getAccounts().get(userId);
                 actualPassword = sc.next();
                 if (actualAccount.getPassword().equals(actualPassword)) {
                     verificator = true;

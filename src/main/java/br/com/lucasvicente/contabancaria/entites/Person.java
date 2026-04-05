@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Person {
+    private Long id;
     private String fullName;
     private String cpf;
     private List<Account> accounts = new ArrayList<>();
 
-    public Person(String fullName, String cpf) {
+    public Person(Long id, String fullName, String cpf) {
+        this.id = id;
         this.fullName = fullName;
         this.cpf = cpf;
     }
@@ -41,5 +43,13 @@ public class Person {
 
     public void addAccount (Account account) {
         this.accounts.add(account);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

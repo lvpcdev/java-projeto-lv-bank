@@ -2,36 +2,34 @@ package br.com.lucasvicente.contabancaria.dao;
 
 import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.database.DbException;
-import br.com.lucasvicente.contabancaria.entites.Person;
+import br.com.lucasvicente.contabancaria.entites.Bank;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersonDao {
-
+public class BankDao {
     private final Connection connection = DatabaseConnection.getConnection();
 
 
-    public List<Person> findAll() {
+    public List<Bank> findAll() {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
 
-            String sql = "SELECT * FROM people ORDER BY name";
+            String sql = "SELECT * FROM banks ORDER BY bankName";
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery(sql);
 
-            List<Person> people = new ArrayList<>();
+            List<Bank> banks = new ArrayList<>();
 
             while (resultSet.next()) {
-                Person person = new Person();
-                person.setId(resultSet.getLong("Id"));
-                person.setFullName(resultSet.getString("Name"));
-                person.setCpf(resultSet.getString("Cpf"));
-                people.add(person);
+                Bank bank = new Bank();
+                bank.setId(resultSet.getLong("name"));
+                bank.setName(resultSet.getString("bankName"));
+                banks.add(bank);
             }
-            return people;
+            return banks;
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
@@ -40,23 +38,22 @@ public class PersonDao {
         }
     }
 
-    public Person findById(Long id) {
+    public Bank findById(Long id) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet= null;
         try {
 
-            String sql = "SELECT * FROM people WHERE id = ?";
+            String sql = "SELECT * FROM banks WHERE id = ?";
 
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                Person person = new Person();
-                person.setId(resultSet.getLong("Id"));
-                person.setFullName(resultSet.getString("Name"));
-                person.setCpf(resultSet.getString("Cpf"));
-                return person;
+                Bank bank = new Bank();
+                bank.setId(resultSet.getLong("id"));
+                bank.setName(resultSet.getString("bankName"));
+                return bank;
             }
             return null;
         } catch (SQLException e) {
@@ -67,18 +64,17 @@ public class PersonDao {
         }
     }
 
-    public Person insert(Person person) {
+    public void insert(Bank bank) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
-                    "INSERT INTO people " +
-                            "(username, cpf) " +
+                    "INSERT INTO banks " +
+                            "(bankName) " +
                             "VALUES " +
-                            "(?, ?)",
+                            "(?)",
                     Statement.RETURN_GENERATED_KEYS);
 
-            preparedStatement.setString(1, person.getFullName());
-            preparedStatement.setString(2, person.getCpf());
+            preparedStatement.setString(1, bank.getName());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -86,14 +82,12 @@ public class PersonDao {
                 ResultSet resultSet = preparedStatement.getGeneratedKeys();
                 if (resultSet.next()) {
                     Long id = resultSet.getLong(1);
-                    person.setId(id);
+                    bank.setId(id);
                 }
             }
             else {
                 throw new DbException("Unexpected error! No rows affected!");
             }
-
-            return person;
         }
         catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -103,17 +97,16 @@ public class PersonDao {
         }
     }
 
-    public void update(Person person) {
+    public void update(Bank bank) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
-                    "UPDATE people "
-                            + "SET username = ?, cpf = ?"
+                    "UPDATE banks "
+                            + "SET bankName = ?"
                             + "WHERE Id = ?");
 
-            preparedStatement.setString(1, person.getFullName());
-            preparedStatement.setString(2, person.getCpf());
-            preparedStatement.setLong(3, person.getId());
+            preparedStatement.setString(1, bank.getName());
+            preparedStatement.setLong(2, bank.getId());
 
             preparedStatement.executeUpdate();
 
@@ -127,7 +120,7 @@ public class PersonDao {
     public void deleteById(Long id) {
         PreparedStatement preparedStatement = null;
         try {
-            preparedStatement = connection.prepareStatement("DELETE FROM people WHERE id = ?");
+            preparedStatement = connection.prepareStatement("DELETE FROM banks WHERE Id = ?");
 
             preparedStatement.setLong(1, id);
 
@@ -138,6 +131,4 @@ public class PersonDao {
             DatabaseConnection.closeStatement(preparedStatement);
         }
     }
-
-
 }

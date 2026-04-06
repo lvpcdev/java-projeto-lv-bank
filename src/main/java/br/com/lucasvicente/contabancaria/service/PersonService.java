@@ -16,8 +16,8 @@ public class PersonService {
         return dao.findById(id);
     }
 
-    public void insert(Person person) {
-        dao.insert(person);
+    public Person insert(Person person) {
+        return dao.insert(person);
     }
 
     public void delete(long id) {

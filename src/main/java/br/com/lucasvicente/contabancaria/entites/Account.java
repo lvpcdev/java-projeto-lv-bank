@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Account {
+
+    private Long id;
     private Bank bank;
     private Person person;
     private String password;
@@ -15,15 +17,25 @@ public class Account {
     private List<String> pixKeys = new ArrayList<>();
 
     public Account() {
+        this.balance = new BigDecimal("0.0");
     }
 
-    public Account(Bank bank, Person person, String password, int accountNumber, String agency) {
+    public Account(Long id,Bank bank, Person person, String password, int accountNumber, String agency) {
+        this.id = id;
         this.bank = bank;
         this.person = person;
         this.password = password;
         this.accountNumber = accountNumber;
         this.agency = agency;
         this.balance = new BigDecimal("0.0");
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Bank getBank() {
@@ -78,6 +90,10 @@ public class Account {
 
     public BigDecimal getBalance() {
         return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public void depostit(BigDecimal balance) {

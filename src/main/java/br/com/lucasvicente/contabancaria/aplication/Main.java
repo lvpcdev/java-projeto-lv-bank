@@ -1,5 +1,7 @@
 package br.com.lucasvicente.contabancaria.aplication;
 
+import br.com.lucasvicente.contabancaria.controller.AccountController;
+import br.com.lucasvicente.contabancaria.controller.BankController;
 import br.com.lucasvicente.contabancaria.controller.PersonController;
 import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.entites.Account;
@@ -15,13 +17,16 @@ public class Main {
 
 
     private static final PersonController personController = new PersonController();
+    private static final BankController bankController = new BankController();
+    private static final AccountController accountController = new AccountController();
 
     public static void main(String[] args) throws SQLException {
         DatabaseConnection.startDataBase();
         org.h2.tools.Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
 
 
-        Bank bank = new Bank("lv-bank");
+        bankController.insert("lv-bank");
+        Bank bank = bankController.findById(1);
 
         Scanner sc = new Scanner(System.in);
 
@@ -57,9 +62,9 @@ public class Main {
 
                 if (confirmPassword.equals(password)) {
                     verificator = true;
-                    Person newUser = new Person(null, username, cpf);
-                    Account newAccount = new Account(bank,newUser,password, bank.getAccounts().size()+1, "0001");
-                    personController.insert(username,cpf);
+                    Person newUser = personController.insert(username,cpf);
+                    Account newAccount = accountController.insert(bank, newUser, password, bank.getAccounts().size()+1, "0001");
+
                     newUser.addAccount(newAccount);
                     bank.addAccount(newAccount);
                 } else {

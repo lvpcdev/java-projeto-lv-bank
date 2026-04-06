@@ -23,17 +23,35 @@ public class DatabaseConnection {
     }
 
     public static void startDataBase() {
-        String sql =
+        String people =
                 "CREATE TABLE IF NOT EXISTS people ("
-                + "Id BIGINT AUTO_INCREMENT PRIMARY KEY,"
-                + "Username VARCHAR(255) NOT NULL,"
-                + "Cpf VARCHAR(11) NOT NULL UNIQUE)";
+                + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+                + "username VARCHAR(255) NOT NULL,"
+                + "cpf VARCHAR(11) NOT NULL UNIQUE);";
+        String bank =
+                "CREATE TABLE IF NOT EXISTS banks ("
+                + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+                + "bankName VARCHAR(255) NOT NULL);";
+        String account =
+                "CREATE TABLE IF NOT EXISTS accounts ("
+                + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+                + "bank_id BIGINT NOT NULL,"
+                + "person_id BIGINT NOT NULL,"
+                + "password VARCHAR(50) NOT NULL,"
+                + "accountNumber BIGINT NOT NULL UNIQUE,"
+                + "agency VARCHAR(10) NOT NULL,"
+                + "balance DECIMAL(15, 2) NOT NULL DEFAULT 0.00,"
+
+                + "FOREIGN KEY (bank_id) REFERENCES banks(id),"
+                + "FOREIGN KEY (person_id) REFERENCES people(id));";
 
         Statement statement = null;
         try {
             Connection connection = getConnection();
             statement = conn.createStatement();
-            statement.execute(sql);
+            statement.execute(people);
+            statement.execute(bank);
+            statement.execute(account);
             System.out.println("Banco de dados H2 inicializado com sucesso!");
         } catch (SQLException e) {
             throw new DbException("Erro ao inicializar banco: " + e.getMessage());

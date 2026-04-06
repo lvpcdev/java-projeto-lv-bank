@@ -4,11 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bank {
+    private Long id;
     private String name;
     private List<Account> accounts = new ArrayList<>();
 
-    public Bank(String name) {
-        name = this.name;
+    public Bank() {
+    }
+
+    public Bank(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

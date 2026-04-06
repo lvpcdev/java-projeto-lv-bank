@@ -17,15 +17,16 @@ public class PersonController {
         return service.findById(id);
     }
 
-    public void insert (String fullName, String cpf) {
+    public Person insert (String fullName, String cpf) {
         Person person = new Person();
         person.setFullName(fullName);
         person.setCpf(cpf);
-        service.insert(person);
+        return service.insert(person);
     }
 
     public void update (long id, String fullName, String cpf) {
         Person person = new Person();
+        person.setId(id);
         person.setFullName(fullName);
         person.setCpf(cpf);
         service.update(person);

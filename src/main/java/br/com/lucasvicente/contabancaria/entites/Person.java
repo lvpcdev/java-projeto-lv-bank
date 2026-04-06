@@ -10,15 +10,17 @@ public class Person {
     private String cpf;
     private List<Account> accounts = new ArrayList<>();
 
+    public Person(){
+
+    }
+
     public Person(Long id, String fullName, String cpf) {
         this.id = id;
         this.fullName = fullName;
         this.cpf = cpf;
     }
 
-    public Person(){
 
-    }
 
 
     public String getFullName() {

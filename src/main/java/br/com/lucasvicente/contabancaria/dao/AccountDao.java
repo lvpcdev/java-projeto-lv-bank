@@ -2,36 +2,49 @@ package br.com.lucasvicente.contabancaria.dao;
 
 import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.database.DbException;
+import br.com.lucasvicente.contabancaria.entites.Account;
+import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersonDao {
-
+public class AccountDao {
     private final Connection connection = DatabaseConnection.getConnection();
 
 
-    public List<Person> findAll() {
+    public List<Account> findAll() {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
 
-            String sql = "SELECT * FROM people ORDER BY name";
+            String sql = "SELECT * FROM accounts ORDER BY person_id";
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery(sql);
 
-            List<Person> people = new ArrayList<>();
+            List<Account> accounts = new ArrayList<>();
 
             while (resultSet.next()) {
+                Account account = new Account();
+
+                account.setId(resultSet.getLong("Id"));
+                account.setAccountNumber(resultSet.getInt("accountNumber"));
+                account.setAgency(resultSet.getString("agency"));
+                account.setPassword(resultSet.getString("password"));
+                account.setBalance(resultSet.getBigDecimal("balance"));
+
+                Bank bank = new Bank();
+                bank.setId(resultSet.getLong("bank_id"));
+                account.setBank(bank);
+
                 Person person = new Person();
-                person.setId(resultSet.getLong("Id"));
-                person.setFullName(resultSet.getString("Name"));
-                person.setCpf(resultSet.getString("Cpf"));
-                people.add(person);
+                person.setId(resultSet.getLong("person_id"));
+                account.setPerson(person);
+
+                accounts.add(account);
             }
-            return people;
+            return accounts;
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
@@ -40,23 +53,34 @@ public class PersonDao {
         }
     }
 
-    public Person findById(Long id) {
+    public Account findById(Long id) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet= null;
         try {
 
-            String sql = "SELECT * FROM people WHERE id = ?";
+            String sql = "SELECT * FROM accounts WHERE id = ?";
 
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
+                Account account = new Account();
+                account.setId(resultSet.getLong("Id"));
+                account.setAccountNumber(resultSet.getInt("accountNumber"));
+                account.setAgency(resultSet.getString("agency"));
+                account.setPassword(resultSet.getString("password"));
+                account.setBalance(resultSet.getBigDecimal("balance"));
+
+                Bank bank = new Bank();
+                bank.setId(resultSet.getLong("bank_id"));
+                account.setBank(bank);
+
                 Person person = new Person();
-                person.setId(resultSet.getLong("Id"));
-                person.setFullName(resultSet.getString("Name"));
-                person.setCpf(resultSet.getString("Cpf"));
-                return person;
+                person.setId(resultSet.getLong("person_id"));
+                account.setPerson(person);
+
+                return account;
             }
             return null;
         } catch (SQLException e) {
@@ -67,18 +91,22 @@ public class PersonDao {
         }
     }
 
-    public Person insert(Person person) {
+    public Account insert(Account account) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
-                    "INSERT INTO people " +
-                            "(username, cpf) " +
+                    "INSERT INTO accounts " +
+                            "(bank_id, person_id, password, balance, accountNumber, agency) " +
                             "VALUES " +
-                            "(?, ?)",
+                            "(?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
 
-            preparedStatement.setString(1, person.getFullName());
-            preparedStatement.setString(2, person.getCpf());
+            preparedStatement.setLong(1, account.getBank().getId());
+            preparedStatement.setLong(2, account.getPerson().getId());
+            preparedStatement.setString(3, account.getPassword());
+            preparedStatement.setBigDecimal(4, account.getBalance());
+            preparedStatement.setInt(5, account.getAccountNumber());
+            preparedStatement.setString(6, account.getAgency());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -86,14 +114,14 @@ public class PersonDao {
                 ResultSet resultSet = preparedStatement.getGeneratedKeys();
                 if (resultSet.next()) {
                     Long id = resultSet.getLong(1);
-                    person.setId(id);
+                    account.setId(id);
                 }
             }
             else {
                 throw new DbException("Unexpected error! No rows affected!");
             }
 
-            return person;
+            return account;
         }
         catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -103,17 +131,16 @@ public class PersonDao {
         }
     }
 
-    public void update(Person person) {
+    public void update(Account account) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
-                    "UPDATE people "
-                            + "SET username = ?, cpf = ?"
+                    "UPDATE accounts "
+                            + "SET password = ?"
                             + "WHERE Id = ?");
 
-            preparedStatement.setString(1, person.getFullName());
-            preparedStatement.setString(2, person.getCpf());
-            preparedStatement.setLong(3, person.getId());
+            preparedStatement.setString(1, account.getPassword());
+            preparedStatement.setLong(2, account.getId());
 
             preparedStatement.executeUpdate();
 
@@ -127,7 +154,7 @@ public class PersonDao {
     public void deleteById(Long id) {
         PreparedStatement preparedStatement = null;
         try {
-            preparedStatement = connection.prepareStatement("DELETE FROM people WHERE id = ?");
+            preparedStatement = connection.prepareStatement("DELETE FROM accounts WHERE Id = ?");
 
             preparedStatement.setLong(1, id);
 
@@ -138,6 +165,4 @@ public class PersonDao {
             DatabaseConnection.closeStatement(preparedStatement);
         }
     }
-
-
 }

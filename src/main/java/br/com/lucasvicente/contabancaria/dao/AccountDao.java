@@ -6,6 +6,7 @@ import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,13 @@ public class AccountDao {
 
 
     public List<Account> findAll() {
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
 
             String sql = "SELECT * FROM accounts ORDER BY person_id";
             statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery(sql);
+            resultSet = statement.executeQuery();
 
             List<Account> accounts = new ArrayList<>();
 
@@ -159,6 +160,46 @@ public class AccountDao {
             preparedStatement.setLong(1, id);
 
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DatabaseConnection.closeStatement(preparedStatement);
+        }
+    }
+
+    public void deposit(Long accountId, BigDecimal value) {
+        PreparedStatement preparedStatement = null;
+        try {
+            String sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+            preparedStatement = connection.prepareStatement(
+                    "UPDATE accounts SET balance = balance + ? "
+                        + "WHERE id = ?");
+
+            preparedStatement.setBigDecimal(1, value);
+            preparedStatement.setLong(2, accountId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DatabaseConnection.closeStatement(preparedStatement);
+        }
+    }
+
+    public void withdraw(Long accountId, BigDecimal value) {
+        PreparedStatement preparedStatement = null;
+        try {
+            String sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+            preparedStatement = connection.prepareStatement(
+                    "UPDATE accounts SET balance = balance - ? "
+                            + "WHERE id = ?");
+
+            preparedStatement.setBigDecimal(1, value);
+            preparedStatement.setLong(2, accountId);
+
+            preparedStatement.executeUpdate();
+
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {

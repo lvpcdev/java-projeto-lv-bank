@@ -3,13 +3,16 @@ package br.com.lucasvicente.contabancaria.aplication;
 import br.com.lucasvicente.contabancaria.controller.AccountController;
 import br.com.lucasvicente.contabancaria.controller.BankController;
 import br.com.lucasvicente.contabancaria.controller.PersonController;
+import br.com.lucasvicente.contabancaria.controller.PixKeyController;
 import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
+import br.com.lucasvicente.contabancaria.entites.PixKey;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -19,6 +22,7 @@ public class Main {
     private static final PersonController personController = new PersonController();
     private static final BankController bankController = new BankController();
     private static final AccountController accountController = new AccountController();
+    private static final PixKeyController pixKeyController = new PixKeyController();
 
     public static void main(String[] args) throws SQLException {
         DatabaseConnection.startDataBase();
@@ -31,7 +35,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         boolean verificator;
-        int comparator, selection;
+        int selection;
         byte menuP;
         String actualCpf, confirmPassword, actualPassword, username, cpf, password, keyPix;
         Account actualAccount = new Account();
@@ -112,19 +116,13 @@ public class Main {
 
                 switch (menuP) {
                     case 1:
-                        System.out.printf("Saldo disponível: %.2f%n", actualAccount.getBalance());
+                        System.out.printf("Saldo disponível: %.2f%n", accountController.findById(actualAccount.getId()).getBalance());
                         break;
                     case 2:
                         System.out.println("informe o valor que deseja  sacar:");
                         BigDecimal money = sc.nextBigDecimal();
-                        comparator = money.compareTo(actualAccount.getBalance());
-                        if (comparator > 0) {
-                            System.out.println("Valor de saque maior do do que valor disponivel");
+                        accountController.withdraw(actualAccount.getId(), money);
 
-                        } else {
-                            actualAccount.withdraw(money);
-                            System.out.println("Saque efetuado!");
-                        }
                         break;
                     case 3:
                         System.out.println("Selecione uma das opções abaixo:");
@@ -135,21 +133,39 @@ public class Main {
                         menuP = sc.nextByte();
                         switch (menuP) {
                             case 1:
-                                System.out.println("Informe a chave pix do destinatário:");
+                                System.out.print("Informe a chave pix do destinatário: ");
+                                String pixKey = sc.next();
+                                System.out.print("Informe o valor a ser envido: ");
+                                money = sc.nextBigDecimal();
+                                List<Account> accounts = accountController.findAll();
+                                for (Account account : accounts) {
+                                    List<PixKey> pixKeys = pixKeyController.findAllByAccountId(account.getId());
+                                    for (PixKey pk : pixKeys) {
+                                        if (pk.getKeyValue().equals(pixKey)) {
+                                            accountController.withdraw(actualAccount.getId(), money);
+                                            accountController.deposit(account.getId(), money);
+                                            System.out.println("Pix enviado com sucesso!");
+                                            break;
+                                        }
+                                    }
+
+                                }
                                 break;
                             case 2:
                                 System.out.print("Chaves cadrastadas: ");
-                                if(actualAccount.getPixKeys().size() == 0) {
+                                List<PixKey> pixKeys = pixKeyController.findAllByAccountId(actualAccount.getId());
+                                if(pixKeys.size() == 0) {
                                     System.out.println(0);
                                 } else {
-                                    System.out.println(actualAccount.getPixKeys().size());
-                                    for (int i = 0; i < actualAccount.getPixKeys().size(); i++){
-                                        System.out.printf("Chave %d: %s%n",i+1,actualAccount.getPixKeys().get(i));
+                                    System.out.println(pixKeys.size());
+                                    for (int i = 0; i < pixKeys.size(); i++){
+                                        System.out.printf("Chave %d: %s%n",i+1,pixKeys.get(i).getKeyValue());
                                     }
                                 }
                                 System.out.println("Informe a chave pix para cadastrar:");
                                 keyPix = sc.next();
                                 actualAccount.addPixKey(keyPix);
+                                pixKeyController.insert(keyPix, actualAccount);
                                 System.out.println("Chave cadastrada com sucesso!");
                                 break;
                         }
@@ -157,7 +173,7 @@ public class Main {
                     case 4:
                         System.out.println("Informe o valor que será adicionado na conta:");
                         money = sc.nextBigDecimal();
-                        actualAccount.depostit(money);
+                        accountController.deposit(actualAccount.getId(), money);
                         System.out.println("Valor adicionado!");
                         break;
                     case 5:

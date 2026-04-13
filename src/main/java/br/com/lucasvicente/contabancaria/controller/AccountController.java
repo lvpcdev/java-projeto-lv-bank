@@ -5,6 +5,7 @@ import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.service.AccountService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class AccountController {
@@ -36,7 +37,15 @@ public class AccountController {
         service.update(account);
     }
 
-    public void delete(long id) {
+    public void delete(Long id) {
         service.delete(id);
+    }
+
+    public void deposit (Long accountId, BigDecimal value) {
+        service.deposit(accountId, value);
+    }
+
+    public void withdraw(Long accountId, BigDecimal value) {
+        service.withdraw(accountId, value);
     }
 }

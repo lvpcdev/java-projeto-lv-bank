@@ -45,6 +45,14 @@ public class DatabaseConnection {
                 + "FOREIGN KEY (bank_id) REFERENCES banks(id),"
                 + "FOREIGN KEY (person_id) REFERENCES people(id));";
 
+        String pixKey =
+                "CREATE TABLE IF NOT EXISTS pix_keys ("
+                        + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+                        + "account_id BIGINT NOT NULL,"
+                        + "key_value VARCHAR(50) NOT NULL,"
+
+                        + "FOREIGN KEY (account_id) REFERENCES accounts(id));";
+
         Statement statement = null;
         try {
             Connection connection = getConnection();
@@ -52,6 +60,7 @@ public class DatabaseConnection {
             statement.execute(people);
             statement.execute(bank);
             statement.execute(account);
+            statement.execute(pixKey);
             System.out.println("Banco de dados H2 inicializado com sucesso!");
         } catch (SQLException e) {
             throw new DbException("Erro ao inicializar banco: " + e.getMessage());

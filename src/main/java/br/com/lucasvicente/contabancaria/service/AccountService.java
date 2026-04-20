@@ -37,8 +37,10 @@ public class AccountService {
         int comparator;
         comparator = value.compareTo(findById(accountId).getBalance());
         if (comparator > 0) {
-            System.out.println("Valor de saque maior do do que valor disponivel");
+            System.out.println("Valor de saque maior do que valor disponivel");
 
+        } else if (comparator < 0) {
+            System.out.println("Valor não pode ser negativo");
         } else {
             dao.withdraw(accountId, value);
             System.out.println("Saque efetuado!");

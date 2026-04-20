@@ -67,10 +67,9 @@ public class Main {
                 if (confirmPassword.equals(password)) {
                     verificator = true;
                     Person newUser = personController.insert(username,cpf);
-                    Account newAccount = accountController.insert(bank, newUser, password, bank.getAccounts().size()+1, "0001");
+                    Account newAccount = accountController.insert(bank, newUser, password, accountController.findAll().size()+1, "0001");
 
-                    newUser.addAccount(newAccount);
-                    bank.addAccount(newAccount);
+
                 } else {
                     System.out.println("Tente novamente");
                 }
@@ -79,10 +78,12 @@ public class Main {
 
         } else if (selection == 1) {
 
+            List<Account> accounts = accountController.findAll();
+
             System.out.println("Digite o seu cpf:");
             actualCpf = sc.next();
-            for (int i = 0; i < bank.getAccounts().size() && verificator == false; i++) {
-                actualAccount = bank.getAccounts().get(i);
+            for (int i = 1; i <= accounts.size() && verificator == false; i++) {
+                actualAccount = accountController.findById(i);
 
                 if (actualAccount.getPerson().getCpf().equals(actualCpf)) {
                     verificator = true;
@@ -137,7 +138,7 @@ public class Main {
                                 String pixKey = sc.next();
                                 System.out.print("Informe o valor a ser envido: ");
                                 money = sc.nextBigDecimal();
-                                List<Account> accounts = accountController.findAll();
+                                //List<Account> accounts = accountController.findAll();
                                 for (Account account : accounts) {
                                     List<PixKey> pixKeys = pixKeyController.findAllByAccountId(account.getId());
                                     for (PixKey pk : pixKeys) {
@@ -164,7 +165,6 @@ public class Main {
                                 }
                                 System.out.println("Informe a chave pix para cadastrar:");
                                 keyPix = sc.next();
-                                actualAccount.addPixKey(keyPix);
                                 pixKeyController.insert(keyPix, actualAccount);
                                 System.out.println("Chave cadastrada com sucesso!");
                                 break;

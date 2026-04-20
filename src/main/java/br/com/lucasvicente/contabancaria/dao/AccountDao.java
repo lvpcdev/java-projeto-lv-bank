@@ -59,7 +59,14 @@ public class AccountDao {
         ResultSet resultSet= null;
         try {
 
-            String sql = "SELECT * FROM accounts WHERE id = ?";
+            String sql = "SELECT accounts.*," +
+                    " banks.bankname as bank_name,"+
+                    " people.username as person_name," +
+                    " people.cpf as person_cpf," +
+                    " FROM accounts" +
+                    " INNER JOIN banks ON accounts.bank_id = banks.id" +
+                    " INNER JOIN people ON accounts.person_id = people.id" +
+                    " WHERE accounts.id = ?";
 
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, id);
@@ -75,10 +82,13 @@ public class AccountDao {
 
                 Bank bank = new Bank();
                 bank.setId(resultSet.getLong("bank_id"));
+                bank.setName(resultSet.getString("bankname"));
                 account.setBank(bank);
 
                 Person person = new Person();
                 person.setId(resultSet.getLong("person_id"));
+                person.setCpf(resultSet.getString("cpf"));
+                person.setFullName(resultSet.getString("username"));
                 account.setPerson(person);
 
                 return account;

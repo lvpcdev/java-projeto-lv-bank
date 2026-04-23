@@ -9,6 +9,8 @@ import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.entites.PixKey;
+import br.com.lucasvicente.contabancaria.exceptions.InsufficientBalanceException;
+import br.com.lucasvicente.contabancaria.exceptions.NegativeValueException;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -122,8 +124,12 @@ public class Main {
                     case 2:
                         System.out.println("informe o valor que deseja  sacar:");
                         BigDecimal money = sc.nextBigDecimal();
-                        accountController.withdraw(actualAccount.getId(), money);
+                        try {
 
+                            accountController.withdraw(actualAccount.getId(), money);
+                        } catch (InsufficientBalanceException | NegativeValueException e) {
+                            System.out.println("Erro: " + e.getMessage());
+                        }
                         break;
                     case 3:
                         System.out.println("Selecione uma das opções abaixo:");
@@ -143,9 +149,14 @@ public class Main {
                                     List<PixKey> pixKeys = pixKeyController.findAllByAccountId(account.getId());
                                     for (PixKey pk : pixKeys) {
                                         if (pk.getKeyValue().equals(pixKey)) {
-                                            accountController.withdraw(actualAccount.getId(), money);
-                                            accountController.deposit(account.getId(), money);
-                                            System.out.println("Pix enviado com sucesso!");
+                                            try {
+                                                accountController.withdraw(actualAccount.getId(), money);
+                                                accountController.deposit(account.getId(), money);
+                                                System.out.println("Pix enviado com sucesso!");
+                                            } catch (InsufficientBalanceException | NegativeValueException e) {
+                                                System.out.println("Erro: " + e.getMessage());
+                                            }
+
                                             break;
                                         }
                                     }
@@ -173,14 +184,19 @@ public class Main {
                     case 4:
                         System.out.println("Informe o valor que será adicionado na conta:");
                         money = sc.nextBigDecimal();
-                        accountController.deposit(actualAccount.getId(), money);
-                        System.out.println("Valor adicionado!");
+                        try {
+                            accountController.deposit(actualAccount.getId(), money);
+                            System.out.println("Valor adicionado!");
+                        } catch (NegativeValueException e) {
+                            System.out.println("Erro " + e.getMessage());
+                        }
+
                         break;
                     case 5:
                         System.out.println("Saindo do sistema");
                         break;
                     default:
-                        System.out.println("Error: Valor digitado inválido");
+                        System.out.println("Erro: Valor digitado inválido");
                         break;
                 }
 

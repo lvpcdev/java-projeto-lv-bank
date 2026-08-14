@@ -28,10 +28,8 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
         DatabaseConnection.startDataBase();
-        org.h2.tools.Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
 
 
-        bankController.insert("lv-bank");
         Bank bank = bankController.findById(1);
 
         Scanner sc = new Scanner(System.in);

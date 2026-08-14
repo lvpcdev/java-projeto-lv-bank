@@ -23,22 +23,23 @@ public class DatabaseConnection {
     }
 
     public static void startDataBase() {
+
         String people =
                 "CREATE TABLE IF NOT EXISTS people ("
-                + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+                + "id SERIAL PRIMARY KEY,"
                 + "username VARCHAR(255) NOT NULL,"
                 + "cpf VARCHAR(11) NOT NULL UNIQUE);";
         String bank =
                 "CREATE TABLE IF NOT EXISTS banks ("
-                + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+                + "id SERIAL PRIMARY KEY,"
                 + "bankName VARCHAR(255) NOT NULL);";
         String account =
                 "CREATE TABLE IF NOT EXISTS accounts ("
-                + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
-                + "bank_id BIGINT NOT NULL,"
-                + "person_id BIGINT NOT NULL,"
+                + "id SERIAL PRIMARY KEY,"
+                + "bank_id INT NOT NULL,"
+                + "person_id INT NOT NULL,"
                 + "password VARCHAR(50) NOT NULL,"
-                + "accountNumber BIGINT NOT NULL UNIQUE,"
+                + "accountNumber INT NOT NULL UNIQUE,"
                 + "agency VARCHAR(10) NOT NULL,"
                 + "balance DECIMAL(15, 2) NOT NULL DEFAULT 0.00,"
 
@@ -47,8 +48,8 @@ public class DatabaseConnection {
 
         String pixKey =
                 "CREATE TABLE IF NOT EXISTS pix_keys ("
-                        + "id BIGINT AUTO_INCREMENT PRIMARY KEY,"
-                        + "account_id BIGINT NOT NULL,"
+                        + "id SERIAL PRIMARY KEY,"
+                        + "account_id INT NOT NULL,"
                         + "key_value VARCHAR(50) NOT NULL,"
 
                         + "FOREIGN KEY (account_id) REFERENCES accounts(id));";
@@ -61,7 +62,7 @@ public class DatabaseConnection {
             statement.execute(bank);
             statement.execute(account);
             statement.execute(pixKey);
-            System.out.println("Banco de dados H2 inicializado com sucesso!");
+            System.out.println("Banco de dados postgreSQL inicializado com sucesso!");
         } catch (SQLException e) {
             throw new DbException("Erro ao inicializar banco: " + e.getMessage());
         } finally {

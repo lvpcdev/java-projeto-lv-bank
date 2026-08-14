@@ -59,10 +59,7 @@ public class AccountDao {
         ResultSet resultSet= null;
         try {
 
-            String sql = "SELECT accounts.*," +
-                    " banks.bankname as bank_name,"+
-                    " people.username as person_name," +
-                    " people.cpf as person_cpf," +
+            String sql = "SELECT *" +
                     " FROM accounts" +
                     " INNER JOIN banks ON accounts.bank_id = banks.id" +
                     " INNER JOIN people ON accounts.person_id = people.id" +

@@ -10,7 +10,6 @@ public record AccountResponseDTO (
         Long id,
         BankResumeDTO bank,
         PersonResumeDTO person,
-        String password,
         BigDecimal balance,
         Integer accountNumber,
         String agency,

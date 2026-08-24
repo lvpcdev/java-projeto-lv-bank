@@ -11,7 +11,7 @@ public class Account {
     private Person person;
     private String password;
     private BigDecimal balance;
-    private int accountNumber;
+    private Integer accountNumber;
     private String agency;
 
     private List<String> pixKeys = new ArrayList<>();
@@ -20,7 +20,7 @@ public class Account {
         this.balance = new BigDecimal("0.0");
     }
 
-    public Account(Long id,Bank bank, Person person, String password, int accountNumber, String agency) {
+    public Account(Long id,Bank bank, Person person, String password, Integer accountNumber, String agency) {
         this.id = id;
         this.bank = bank;
         this.person = person;

@@ -20,7 +20,11 @@ public class AccountDao {
         ResultSet resultSet = null;
         try {
 
-            String sql = "SELECT * FROM accounts ORDER BY person_id";
+            String sql = "SELECT * " +
+                    "FROM accounts " +
+                    "INNER JOIN banks ON accounts.bank_id = banks.id " +
+                    "INNER JOIN people ON accounts.person_id = people.id " +
+                    "ORDER BY person_id";
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
 
@@ -37,10 +41,13 @@ public class AccountDao {
 
                 Bank bank = new Bank();
                 bank.setId(resultSet.getLong("bank_id"));
+                bank.setName(resultSet.getString("bankname"));
                 account.setBank(bank);
 
                 Person person = new Person();
                 person.setId(resultSet.getLong("person_id"));
+                person.setCpf(resultSet.getString("cpf"));
+                person.setFullName(resultSet.getString("username"));
                 account.setPerson(person);
 
                 accounts.add(account);
@@ -139,18 +146,20 @@ public class AccountDao {
         }
     }
 
-    public void update(Account account) {
+    public Account update(Account account) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
                     "UPDATE accounts "
-                            + "SET password = ?"
+                            + "SET password = ? "
                             + "WHERE Id = ?");
 
             preparedStatement.setString(1, account.getPassword());
             preparedStatement.setLong(2, account.getId());
 
             preparedStatement.executeUpdate();
+
+            return account;
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());

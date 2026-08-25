@@ -29,21 +29,15 @@ public class DatabaseConnection {
                 + "id SERIAL PRIMARY KEY,"
                 + "username VARCHAR(255) NOT NULL,"
                 + "cpf VARCHAR(11) NOT NULL UNIQUE);";
-        String bank =
-                "CREATE TABLE IF NOT EXISTS banks ("
-                + "id SERIAL PRIMARY KEY,"
-                + "bankName VARCHAR(255) NOT NULL);";
         String account =
                 "CREATE TABLE IF NOT EXISTS accounts ("
                 + "id SERIAL PRIMARY KEY,"
-                + "bank_id INT NOT NULL,"
                 + "person_id INT NOT NULL,"
                 + "password VARCHAR(50) NOT NULL,"
                 + "accountNumber INT NOT NULL UNIQUE,"
                 + "agency VARCHAR(10) NOT NULL,"
                 + "balance DECIMAL(15, 2) NOT NULL DEFAULT 0.00,"
 
-                + "FOREIGN KEY (bank_id) REFERENCES banks(id),"
                 + "FOREIGN KEY (person_id) REFERENCES people(id));";
 
         String pixKey =
@@ -59,7 +53,6 @@ public class DatabaseConnection {
             Connection connection = getConnection();
             statement = conn.createStatement();
             statement.execute(people);
-            statement.execute(bank);
             statement.execute(account);
             statement.execute(pixKey);
             System.out.println("Banco de dados postgreSQL inicializado com sucesso!");

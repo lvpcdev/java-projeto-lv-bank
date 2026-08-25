@@ -3,7 +3,6 @@ package br.com.lucasvicente.contabancaria.dao;
 import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.database.DbException;
 import br.com.lucasvicente.contabancaria.entites.Account;
-import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 
 import java.math.BigDecimal;
@@ -22,7 +21,6 @@ public class AccountDao {
 
             String sql = "SELECT * " +
                     "FROM accounts " +
-                    "INNER JOIN banks ON accounts.bank_id = banks.id " +
                     "INNER JOIN people ON accounts.person_id = people.id " +
                     "ORDER BY person_id";
             statement = connection.prepareStatement(sql);
@@ -38,11 +36,6 @@ public class AccountDao {
                 account.setAgency(resultSet.getString("agency"));
                 account.setPassword(resultSet.getString("password"));
                 account.setBalance(resultSet.getBigDecimal("balance"));
-
-                Bank bank = new Bank();
-                bank.setId(resultSet.getLong("bank_id"));
-                bank.setName(resultSet.getString("bankname"));
-                account.setBank(bank);
 
                 Person person = new Person();
                 person.setId(resultSet.getLong("person_id"));
@@ -68,7 +61,6 @@ public class AccountDao {
 
             String sql = "SELECT *" +
                     " FROM accounts" +
-                    " INNER JOIN banks ON accounts.bank_id = banks.id" +
                     " INNER JOIN people ON accounts.person_id = people.id" +
                     " WHERE accounts.id = ?";
 
@@ -83,11 +75,6 @@ public class AccountDao {
                 account.setAgency(resultSet.getString("agency"));
                 account.setPassword(resultSet.getString("password"));
                 account.setBalance(resultSet.getBigDecimal("balance"));
-
-                Bank bank = new Bank();
-                bank.setId(resultSet.getLong("bank_id"));
-                bank.setName(resultSet.getString("bankname"));
-                account.setBank(bank);
 
                 Person person = new Person();
                 person.setId(resultSet.getLong("person_id"));
@@ -111,17 +98,16 @@ public class AccountDao {
         try {
             preparedStatement = connection.prepareStatement(
                     "INSERT INTO accounts " +
-                            "(bank_id, person_id, password, balance, accountNumber, agency) " +
+                            "(person_id, password, balance, accountNumber, agency) " +
                             "VALUES " +
-                            "(?, ?, ?, ?, ?, ?)",
+                            "(?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
 
-            preparedStatement.setLong(1, account.getBank().getId());
-            preparedStatement.setLong(2, account.getPerson().getId());
-            preparedStatement.setString(3, account.getPassword());
-            preparedStatement.setBigDecimal(4, account.getBalance());
-            preparedStatement.setInt(5, account.getAccountNumber());
-            preparedStatement.setString(6, account.getAgency());
+            preparedStatement.setLong(1, account.getPerson().getId());
+            preparedStatement.setString(2, account.getPassword());
+            preparedStatement.setBigDecimal(3, account.getBalance());
+            preparedStatement.setInt(4, account.getAccountNumber());
+            preparedStatement.setString(5, account.getAgency());
 
             int rowsAffected = preparedStatement.executeUpdate();
 

@@ -7,7 +7,6 @@ import java.util.List;
 public class Account {
 
     private Long id;
-    private Bank bank;
     private Person person;
     private String password;
     private BigDecimal balance;
@@ -20,9 +19,8 @@ public class Account {
         this.balance = new BigDecimal("0.0");
     }
 
-    public Account(Long id,Bank bank, Person person, String password, Integer accountNumber, String agency) {
+    public Account(Long id, Person person, String password, Integer accountNumber, String agency) {
         this.id = id;
-        this.bank = bank;
         this.person = person;
         this.password = password;
         this.accountNumber = accountNumber;
@@ -38,13 +36,6 @@ public class Account {
         this.id = id;
     }
 
-    public Bank getBank() {
-        return bank;
-    }
-
-    public void setBank(Bank bank) {
-        this.bank = bank;
-    }
 
     public Person getPerson() {
         return person;

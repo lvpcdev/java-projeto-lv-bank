@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record AccountRequestDTO(
-        Long bankId,
         Long personId,
         String password,
         BigDecimal balance,

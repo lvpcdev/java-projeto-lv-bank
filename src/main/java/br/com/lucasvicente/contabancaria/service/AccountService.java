@@ -1,14 +1,11 @@
 package br.com.lucasvicente.contabancaria.service;
 
 import br.com.lucasvicente.contabancaria.dao.AccountDao;
-import br.com.lucasvicente.contabancaria.dao.BankDao;
 import br.com.lucasvicente.contabancaria.dao.PersonDao;
-import br.com.lucasvicente.contabancaria.dto.BankResumeDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonResumeDTO;
 import br.com.lucasvicente.contabancaria.dto.requests.AccountRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.responses.AccountResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Account;
-import br.com.lucasvicente.contabancaria.entites.Bank;
 import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.exceptions.InsufficientBalanceException;
 import br.com.lucasvicente.contabancaria.exceptions.NegativeValueException;
@@ -18,7 +15,6 @@ import java.util.List;
 
 public class AccountService {
     private final AccountDao accountDao = new AccountDao();
-    private final BankDao bankDao = new BankDao();
     private final PersonDao personDao = new PersonDao();
 
     public List<AccountResponseDTO> findAll() {
@@ -31,11 +27,9 @@ public class AccountService {
 
     public AccountResponseDTO insert(AccountRequestDTO dto) {
 
-        Bank bank = bankDao.findById(dto.bankId());
         Person person = personDao.findById(dto.personId());
 
         Account account = new Account();
-        account.setBank(bank);
         account.setPerson(person);
         account.setAccountNumber(dto.accountNumber());
         account.setPassword(dto.password());
@@ -84,10 +78,6 @@ public class AccountService {
     private AccountResponseDTO toDTO(Account account) {
         return new AccountResponseDTO(
                 account.getId(),
-                new BankResumeDTO(
-                        account.getBank().getId(),
-                        account.getBank().getName()
-                ),
                 new PersonResumeDTO(
                         account.getPerson().getId(),
                         account.getPerson().getFullName()

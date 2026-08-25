@@ -14,20 +14,20 @@ public class PersonDao {
 
 
     public List<Person> findAll() {
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
 
             String sql = "SELECT * FROM people ORDER BY name";
             statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery(sql);
+            resultSet = statement.executeQuery();
 
             List<Person> people = new ArrayList<>();
 
             while (resultSet.next()) {
                 Person person = new Person();
                 person.setId(resultSet.getLong("Id"));
-                person.setFullName(resultSet.getString("Name"));
+                person.setFullName(resultSet.getString("username"));
                 person.setCpf(resultSet.getString("Cpf"));
                 people.add(person);
             }
@@ -54,7 +54,7 @@ public class PersonDao {
             if (resultSet.next()) {
                 Person person = new Person();
                 person.setId(resultSet.getLong("Id"));
-                person.setFullName(resultSet.getString("Name"));
+                person.setFullName(resultSet.getString("username"));
                 person.setCpf(resultSet.getString("Cpf"));
                 return person;
             }
@@ -108,7 +108,7 @@ public class PersonDao {
         try {
             preparedStatement = connection.prepareStatement(
                     "UPDATE people "
-                            + "SET username = ?, cpf = ?"
+                            + "SET username = ?, cpf = ? "
                             + "WHERE Id = ?");
 
             preparedStatement.setString(1, person.getFullName());

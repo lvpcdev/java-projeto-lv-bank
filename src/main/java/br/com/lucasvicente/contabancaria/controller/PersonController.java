@@ -1,38 +1,101 @@
 package br.com.lucasvicente.contabancaria.controller;
 
+import br.com.lucasvicente.contabancaria.dto.requests.PersonRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.responses.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.service.PersonService;
+import com.google.gson.Gson;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
-public class PersonController {
+public class PersonController implements HttpHandler {
 
-    private final PersonService service = new PersonService();
+    private final PersonService personService = new PersonService();
+    private final Gson gson = new Gson();
 
-    public List<Person> findAll() {
-        return service.findAll();
+    public void findAll(HttpExchange exchange) throws IOException {
+        List<PersonResponseDTO> people = personService.findAll();
+        String json = toJsonList(people);
+        responderJson(exchange, json, 200);
     }
 
-    public Person findById(long id) {
-        return service.findById(id);
+    public void findById(HttpExchange exchange, Long id) throws IOException {
+        PersonResponseDTO person = personService.findById(id);
+        String json = toJson(person);
+        responderJson(exchange, json, 200);
     }
 
-    public Person insert (String fullName, String cpf) {
-        Person person = new Person();
-        person.setFullName(fullName);
-        person.setCpf(cpf);
-        return service.insert(person);
+    public void insert (HttpExchange exchange) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes());
+        PersonRequestDTO dto = parsePersonRequestDTO(body);
+        PersonResponseDTO createdPerson = personService.insert(dto);
+        responderJson(exchange, toJson(createdPerson), 201);
     }
 
-    public void update (long id, String fullName, String cpf) {
-        Person person = new Person();
-        person.setId(id);
-        person.setFullName(fullName);
-        person.setCpf(cpf);
-        service.update(person);
+    public void update (HttpExchange exchange, Long id) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes());
+        PersonRequestDTO dto = parsePersonRequestDTO(body);
+        PersonResponseDTO updatedPerson = personService.update(id, dto);
+        responderJson(exchange, toJson(updatedPerson), 200);
     }
 
-    public void delete(long id) {
-        service.delete(id);
+    public void delete(HttpExchange exchange, Long id) throws IOException {
+        personService.delete(id);
+        exchange.sendResponseHeaders(204, -1);
+        exchange.close();
+    }
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        String metodo = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+
+        try {
+            switch (metodo) {
+                case "GET" -> {
+                    if (path.matches("/people/\\d+")) {
+                        findById(exchange, extrairId(path));
+                    } else {
+                        findAll(exchange);
+                    }
+                }
+                case "POST" -> insert(exchange);
+                case "PUT" -> update(exchange, extrairId(path));
+                case  "DELETE" -> delete(exchange, extrairId(path));
+                default -> responderJson(exchange, "{\"erro\": \"Método não suportado\"}", 400);
+            }
+        } catch (Exception e) {
+            responderJson(exchange, "{\"erro\": \"" + e.getMessage() + "\"}", 400);
+        }
+    }
+
+    private Long extrairId(String path) {
+        String[] parts = path.split("/");
+        return Long.parseLong(parts[2]);
+    }
+
+    private String toJson(PersonResponseDTO dto) {
+        return gson.toJson(dto);
+    }
+
+    private String toJsonList(List<PersonResponseDTO> list) {
+        return gson.toJson(list);
+    }
+
+    private PersonRequestDTO parsePersonRequestDTO(String body) {
+        return gson.fromJson(body, PersonRequestDTO.class);
+    }
+
+    private void responderJson(HttpExchange exchange, String resposta, Integer statusCode) throws IOException {
+        exchange.getResponseHeaders().add("Content-Type", "application/json");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        exchange.sendResponseHeaders(statusCode, resposta.getBytes().length);
+        OutputStream os = exchange.getResponseBody();
+        os.write(resposta.getBytes());
+        os.close();
     }
 }

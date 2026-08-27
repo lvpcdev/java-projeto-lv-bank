@@ -18,7 +18,7 @@ public class PersonDao {
         ResultSet resultSet = null;
         try {
 
-            String sql = "SELECT * FROM people ORDER BY name";
+            String sql = "SELECT * FROM people ORDER BY username";
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
 
@@ -103,7 +103,7 @@ public class PersonDao {
         }
     }
 
-    public void update(Person person) {
+    public Person update(Person person) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
@@ -116,6 +116,8 @@ public class PersonDao {
             preparedStatement.setLong(3, person.getId());
 
             preparedStatement.executeUpdate();
+
+            return person;
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());

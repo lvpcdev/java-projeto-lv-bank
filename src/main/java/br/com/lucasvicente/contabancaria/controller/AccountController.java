@@ -133,7 +133,7 @@ public class AccountController implements HttpHandler {
         return gson.fromJson(body, AccountRequestDTO.class);
     }
 
-    private void responderJson(HttpExchange exchange, String resposta, int statusCode) throws IOException {
+    private void responderJson(HttpExchange exchange, String resposta, Integer statusCode) throws IOException {
         exchange.getResponseHeaders().add("Content-Type", "application/json");
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         exchange.sendResponseHeaders(statusCode, resposta.getBytes().length);

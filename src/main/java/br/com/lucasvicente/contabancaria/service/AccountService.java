@@ -21,7 +21,7 @@ public class AccountService {
         return accountDao.findAll().stream().map(this::toDTO).toList();
     }
 
-    public AccountResponseDTO findById(long id) {
+    public AccountResponseDTO findById(Long id) {
         return toDTO(accountDao.findById(id));
     }
 

@@ -13,7 +13,7 @@ public class Account {
     private Integer accountNumber;
     private String agency;
 
-    private List<String> pixKeys = new ArrayList<>();
+    private List<PixKey> pixKeys = new ArrayList<>();
 
     public Account() {
         this.balance = new BigDecimal("0.0");
@@ -70,12 +70,12 @@ public class Account {
         this.accountNumber = accountNumber;
     }
 
-    public List<String> getPixKeys() {
+    public List<PixKey> getPixKeys() {
         return pixKeys;
     }
 
 
-    public void addPixKey (String pixKey) {
+    public void addPixKey (PixKey pixKey) {
         this.pixKeys.add(pixKey);
     }
 

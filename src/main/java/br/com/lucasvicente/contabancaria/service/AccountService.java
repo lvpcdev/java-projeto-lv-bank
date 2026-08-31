@@ -2,11 +2,14 @@ package br.com.lucasvicente.contabancaria.service;
 
 import br.com.lucasvicente.contabancaria.dao.AccountDao;
 import br.com.lucasvicente.contabancaria.dao.PersonDao;
+import br.com.lucasvicente.contabancaria.dao.PixKeyDao;
 import br.com.lucasvicente.contabancaria.dto.PersonResumeDTO;
+import br.com.lucasvicente.contabancaria.dto.PixKeyResumeDTO;
 import br.com.lucasvicente.contabancaria.dto.requests.AccountRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.responses.AccountResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.Person;
+import br.com.lucasvicente.contabancaria.entites.PixKey;
 import br.com.lucasvicente.contabancaria.exceptions.InsufficientBalanceException;
 import br.com.lucasvicente.contabancaria.exceptions.NegativeValueException;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class AccountService {
     private final AccountDao accountDao = new AccountDao();
     private final PersonDao personDao = new PersonDao();
+    private final PixKeyDao pixKeyDao = new PixKeyDao();
 
     public List<AccountResponseDTO> findAll() {
         return accountDao.findAll().stream().map(this::toDTO).toList();
@@ -76,6 +80,13 @@ public class AccountService {
     }
 
     private AccountResponseDTO toDTO(Account account) {
+
+        List<PixKey> pixKeys = pixKeyDao.findAllByAccountId(account.getId());
+
+        List<PixKeyResumeDTO> pixKeyDTOs = pixKeys.stream()
+                .map(pk -> new PixKeyResumeDTO(pk.getId(), pk.getKeyValue()))
+                .toList();
+
         return new AccountResponseDTO(
                 account.getId(),
                 new PersonResumeDTO(
@@ -85,9 +96,7 @@ public class AccountService {
                 account.getBalance(),
                 account.getAccountNumber(),
                 account.getAgency(),
-                account.getPixKeys()
+                pixKeyDTOs
         );
     }
-
-
 }

@@ -4,6 +4,7 @@ package br.com.lucasvicente.contabancaria.dao;
 import br.com.lucasvicente.contabancaria.database.DatabaseConnection;
 import br.com.lucasvicente.contabancaria.database.DbException;
 import br.com.lucasvicente.contabancaria.entites.Account;
+import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.entites.PixKey;
 
 import java.sql.*;
@@ -16,23 +17,34 @@ public class PixKeyDao {
 
 
     public List<PixKey> findAll() {
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
 
-            String sql = "SELECT * FROM pix_keys ORDER BY key_value";
+            String sql = "SELECT pix_keys.id AS pix_key_id, key_value, account_id, people.id AS person_id, username " +
+                    "FROM pix_keys " +
+                    "INNER JOIN accounts ON pix_keys.account_id = accounts.id " +
+                    "INNER JOIN people ON accounts.person_id = people.id " +
+                    "ORDER BY key_value";
             statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery(sql);
+            resultSet = statement.executeQuery();
 
             List<PixKey> pixKeys = new ArrayList<>();
 
             while (resultSet.next()) {
                 PixKey pixKey = new PixKey();
-                pixKey.setId(resultSet.getLong("Id"));
+                pixKey.setId(resultSet.getLong("pix_key_id"));
                 pixKey.setKeyValue(resultSet.getString("key_value"));
 
                 Account account = new Account();
                 account.setId(resultSet.getLong("account_id"));
+
+                Person person = new Person();
+                person.setId(resultSet.getLong("person_id"));
+                person.setFullName(resultSet.getString("username"));
+
+                account.setPerson(person);
+
                 pixKey.setAccount(account);
 
                 pixKeys.add(pixKey);
@@ -51,7 +63,11 @@ public class PixKeyDao {
         ResultSet resultSet= null;
         try {
 
-            String sql = "SELECT * FROM pix_keys WHERE account_id = ?";
+            String sql = "SELECT pix_keys.id AS pix_key_id, key_value, account_id, people.id AS person_id, username " +
+                    "FROM pix_keys " +
+                    "INNER JOIN accounts ON pix_keys.account_id = accounts.id " +
+                    "INNER JOIN people ON accounts.person_id = people.id " +
+                    "WHERE account_id = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -60,11 +76,18 @@ public class PixKeyDao {
 
             while (resultSet.next()) {
                 PixKey pixKey = new PixKey();
-                pixKey.setId(resultSet.getLong("Id"));
+                pixKey.setId(resultSet.getLong("pix_key_id"));
                 pixKey.setKeyValue(resultSet.getString("key_value"));
 
                 Account account = new Account();
                 account.setId(resultSet.getLong("account_id"));
+
+                Person person = new Person();
+                person.setId(resultSet.getLong("person_id"));
+                person.setFullName(resultSet.getString("username"));
+
+                account.setPerson(person);
+
                 pixKey.setAccount(account);
 
                 pixKeys.add(pixKey);
@@ -83,7 +106,11 @@ public class PixKeyDao {
         ResultSet resultSet= null;
         try {
 
-            String sql = "SELECT * FROM pix_keys WHERE id = ?";
+            String sql = "SELECT pix_keys.id AS pix_key_id, key_value, account_id, people.id AS person_id, username " +
+                    "FROM pix_keys " +
+                    "INNER JOIN accounts ON pix_keys.account_id = accounts.id " +
+                    "INNER JOIN people ON accounts.person_id = people.id " +
+                    "WHERE pix_keys.id = ?";
 
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, id);
@@ -91,11 +118,18 @@ public class PixKeyDao {
 
             if (resultSet.next()) {
                 PixKey pixKey = new PixKey();
-                pixKey.setId(resultSet.getLong("Id"));
+                pixKey.setId(resultSet.getLong("pix_key_id"));
                 pixKey.setKeyValue(resultSet.getString("key_value"));
 
                 Account account = new Account();
                 account.setId(resultSet.getLong("account_id"));
+
+                Person person = new Person();
+                person.setId(resultSet.getLong("person_id"));
+                person.setFullName(resultSet.getString("username"));
+
+                account.setPerson(person);
+
                 pixKey.setAccount(account);
 
                 return pixKey;
@@ -145,18 +179,20 @@ public class PixKeyDao {
         }
     }
 
-    public void update(PixKey pixKey) {
+    public PixKey update(PixKey pixKey) {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
                     "UPDATE pix_keys "
-                            + "SET key_value = ?"
+                            + "SET key_value = ? "
                             + "WHERE Id = ?");
 
             preparedStatement.setString(1, pixKey.getKeyValue());
             preparedStatement.setLong(2, pixKey.getId());
 
             preparedStatement.executeUpdate();
+
+            return pixKey;
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());

@@ -1,8 +1,18 @@
 package br.com.lucasvicente.contabancaria.entites;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "tb_pixkey")
 public class PixKey {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String keyValue;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id")
     private Account account;
 
     public PixKey() {

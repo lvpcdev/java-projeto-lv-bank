@@ -1,18 +1,29 @@
 package br.com.lucasvicente.contabancaria.entites;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "tb_account")
 public class Account {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "person_id")
     private Person person;
+
     private String password;
     private BigDecimal balance;
     private Integer accountNumber;
     private String agency;
 
+   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PixKey> pixKeys = new ArrayList<>();
 
     public Account() {
@@ -62,11 +73,11 @@ public class Account {
         this.agency = agency;
     }
 
-    public int getAccountNumber() {
+    public Integer getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(int accountNumber) {
+    public void setAccountNumber(Integer accountNumber) {
         this.accountNumber = accountNumber;
     }
 

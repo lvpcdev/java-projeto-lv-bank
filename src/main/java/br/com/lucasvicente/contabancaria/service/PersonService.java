@@ -1,21 +1,28 @@
 package br.com.lucasvicente.contabancaria.service;
-
-import br.com.lucasvicente.contabancaria.dao.PersonDao;
+import br.com.lucasvicente.contabancaria.dao.PersonRepository;
 import br.com.lucasvicente.contabancaria.dto.requests.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.responses.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Person;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PersonService {
-    private final PersonDao personDao = new PersonDao();
+    private final PersonRepository personRepository;
+
+    public PersonService(PersonRepository personRepository) {
+        this.personRepository = personRepository;
+    }
 
     public List<PersonResponseDTO> findAll() {
-        return personDao.findAll().stream().map(this::toDTO).toList();
+        return personRepository.findAll().stream().map(this::toDTO).toList();
     }
 
     public PersonResponseDTO findById(Long id) {
-        return toDTO(personDao.findById(id));
+        Person existsPerson = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada."));
+
+        return toDTO(existsPerson);
     }
 
     public PersonResponseDTO insert(PersonRequestDTO dto) {
@@ -25,24 +32,25 @@ public class PersonService {
         person.setFullName(dto.fullName());
         person.setCpf(dto.cpf());
 
-        return toDTO(personDao.insert(person));
+        return toDTO(personRepository.save(person));
     }
 
     public void delete(Long id) {
-        personDao.deleteById(id);
+
+        Person existsPerson = personRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada."));
+
+        personRepository.deleteById(existsPerson.getId());
     }
 
     public PersonResponseDTO update(Long id, PersonRequestDTO dto) {
-        Person existingPerson = personDao.findById(id);
-
-        if (existingPerson == null) {
-            throw new IllegalArgumentException("pessoa não encontrada");
-        }
+        Person existingPerson = personRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada."));
 
         existingPerson.setCpf(dto.cpf());
         existingPerson.setFullName(dto.fullName());
 
-        return toDTO(personDao.update(existingPerson));
+        return toDTO(personRepository.save(existingPerson));
     }
 
     public PersonResponseDTO toDTO(Person person) {

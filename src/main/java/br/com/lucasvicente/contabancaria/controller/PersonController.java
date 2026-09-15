@@ -2,100 +2,48 @@ package br.com.lucasvicente.contabancaria.controller;
 
 import br.com.lucasvicente.contabancaria.dto.requests.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.responses.PersonResponseDTO;
-import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.service.PersonService;
-import com.google.gson.Gson;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
-public class PersonController implements HttpHandler {
+@RestController
+@RequestMapping("/people")
+public class PersonController{
 
-    private final PersonService personService = new PersonService();
-    private final Gson gson = new Gson();
+    private final PersonService personService;
 
-    public void findAll(HttpExchange exchange) throws IOException {
-        List<PersonResponseDTO> people = personService.findAll();
-        String json = toJsonList(people);
-        responderJson(exchange, json, 200);
+    public PersonController(PersonService personService) {
+        this.personService = personService;
     }
 
-    public void findById(HttpExchange exchange, Long id) throws IOException {
-        PersonResponseDTO person = personService.findById(id);
-        String json = toJson(person);
-        responderJson(exchange, json, 200);
+
+    @GetMapping
+    public List<PersonResponseDTO> findAll() {
+        return personService.findAll();
     }
 
-    public void insert (HttpExchange exchange) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes());
-        PersonRequestDTO dto = parsePersonRequestDTO(body);
-        PersonResponseDTO createdPerson = personService.insert(dto);
-        responderJson(exchange, toJson(createdPerson), 201);
+    @GetMapping("/{id}")
+    public PersonResponseDTO findById(@PathVariable Long id){
+        return findById(id);
     }
 
-    public void update (HttpExchange exchange, Long id) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes());
-        PersonRequestDTO dto = parsePersonRequestDTO(body);
-        PersonResponseDTO updatedPerson = personService.update(id, dto);
-        responderJson(exchange, toJson(updatedPerson), 200);
+    @PostMapping
+    public PersonResponseDTO insert (@Valid @RequestBody PersonRequestDTO dto) {
+        return personService.insert(dto);
     }
 
-    public void delete(HttpExchange exchange, Long id) throws IOException {
+    @PutMapping("/{id}")
+    public PersonResponseDTO update (@PathVariable Long id, @Valid @RequestBody PersonRequestDTO dto) {
+        return personService.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id)  {
         personService.delete(id);
-        exchange.sendResponseHeaders(204, -1);
-        exchange.close();
-    }
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String metodo = exchange.getRequestMethod();
-        String path = exchange.getRequestURI().getPath();
-
-        try {
-            switch (metodo) {
-                case "GET" -> {
-                    if (path.matches("/people/\\d+")) {
-                        findById(exchange, extrairId(path));
-                    } else {
-                        findAll(exchange);
-                    }
-                }
-                case "POST" -> insert(exchange);
-                case "PUT" -> update(exchange, extrairId(path));
-                case  "DELETE" -> delete(exchange, extrairId(path));
-                default -> responderJson(exchange, "{\"erro\": \"Método não suportado\"}", 400);
-            }
-        } catch (Exception e) {
-            responderJson(exchange, "{\"erro\": \"" + e.getMessage() + "\"}", 400);
-        }
-    }
-
-    private Long extrairId(String path) {
-        String[] parts = path.split("/");
-        return Long.parseLong(parts[2]);
-    }
-
-    private String toJson(PersonResponseDTO dto) {
-        return gson.toJson(dto);
-    }
-
-    private String toJsonList(List<PersonResponseDTO> list) {
-        return gson.toJson(list);
-    }
-
-    private PersonRequestDTO parsePersonRequestDTO(String body) {
-        return gson.fromJson(body, PersonRequestDTO.class);
-    }
-
-    private void responderJson(HttpExchange exchange, String resposta, Integer statusCode) throws IOException {
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        exchange.sendResponseHeaders(statusCode, resposta.getBytes().length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(resposta.getBytes());
-        os.close();
+        return ResponseEntity.noContent().build();
     }
 }

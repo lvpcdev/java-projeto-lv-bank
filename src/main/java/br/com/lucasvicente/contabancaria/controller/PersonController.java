@@ -27,7 +27,7 @@ public class PersonController{
 
     @GetMapping("/{id}")
     public PersonResponseDTO findById(@PathVariable Long id){
-        return findById(id);
+        return personService.findById(id);
     }
 
     @PostMapping

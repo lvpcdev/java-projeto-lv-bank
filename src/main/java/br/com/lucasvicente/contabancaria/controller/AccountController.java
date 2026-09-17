@@ -1,144 +1,58 @@
 package br.com.lucasvicente.contabancaria.controller;
 
 import br.com.lucasvicente.contabancaria.dto.requests.AccountRequestDTO;
-import br.com.lucasvicente.contabancaria.dto.requests.AmountRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.responses.AccountResponseDTO;
-import br.com.lucasvicente.contabancaria.exceptions.InsufficientBalanceException;
-import br.com.lucasvicente.contabancaria.exceptions.NegativeValueException;
 import br.com.lucasvicente.contabancaria.service.AccountService;
-import com.google.gson.Gson;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class AccountController implements HttpHandler {
-    private final AccountService accountService = new AccountService();
-    private final Gson gson = new Gson();
+@RestController
+@RequestMapping("/accounts")
+public class AccountController {
+    private final AccountService accountService;
 
-    public void findAll(HttpExchange exchange) throws IOException {
-        List<AccountResponseDTO> accounts = accountService.findAll();
-        String json = toJsonList(accounts);
-        responderJson(exchange, json, 200);
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
-    public void findById(HttpExchange exchange, Long id) throws IOException {
-        AccountResponseDTO account = accountService.findById(id);
-        String json = toJson(account);
-        responderJson(exchange, json, 200);
+    @GetMapping
+    public List<AccountResponseDTO> findAll(){
+        return accountService.findAll();
     }
 
-    public void insert (HttpExchange exchange) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes());
-        AccountRequestDTO dto = parseAccountRequestDTO(body);
-        AccountResponseDTO createdAccount = accountService.insert(dto);
-        responderJson(exchange, toJson(createdAccount), 201);
+    @GetMapping("/{id}")
+    public AccountResponseDTO findById(@PathVariable Long id) {
+        return accountService.findById(id);
     }
 
-    public void update (HttpExchange exchange, Long id) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes());
-        AccountRequestDTO dto = parseAccountRequestDTO(body);
-        AccountResponseDTO updatedAccount = accountService.update(id, dto);
-        responderJson(exchange, toJson(updatedAccount), 200);
+    @PostMapping
+    public AccountResponseDTO insert (@Valid @RequestBody AccountRequestDTO dto) {
+        return accountService.insert(dto);
     }
 
-    public void delete(HttpExchange exchange, Long id) throws IOException {
+    @PutMapping("/{id}")
+    public AccountResponseDTO update (@PathVariable Long id, @Valid @RequestBody AccountRequestDTO dto) {
+        return accountService.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         accountService.delete(id);
-        exchange.sendResponseHeaders(204, -1);
-        exchange.close();
+
+        return ResponseEntity.noContent().build();
     }
 
-    public void deposit (HttpExchange exchange, Long id) throws IOException{
-        String body = new String(exchange.getRequestBody().readAllBytes());
-        AmountRequestDTO dto = gson.fromJson(body, AmountRequestDTO.class);
-
-        try {
-            accountService.deposit(id, dto.amount());
-
-            AccountResponseDTO account = accountService.findById(id);
-            String json = toJson(account);
-
-            responderJson(exchange, json,200);
-        } catch (NegativeValueException e) {
-            responderJson(exchange, "{\"erro\": \"" + e.getMessage() + "\"}", 400);
-        }
+    @PatchMapping("/{id}/deposit")
+    public void deposit (@PathVariable Long id, @RequestParam BigDecimal value) {
+        accountService.deposit(id, value);
     }
 
-    public void withdraw(HttpExchange exchange, Long id) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes());
-        AmountRequestDTO dto = gson.fromJson(body, AmountRequestDTO.class);
-
-        try {
-            accountService.withdraw(id, dto.amount());
-
-            AccountResponseDTO account = accountService.findById(id);
-            String json = toJson(account);
-
-            responderJson(exchange, json,200);
-        } catch (NegativeValueException | InsufficientBalanceException e) {
-            responderJson(exchange, "{\"erro\": \"" + e.getMessage() + "\"}", 400);
-        }
-    }
-
-
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String metodo = exchange.getRequestMethod();
-        String path = exchange.getRequestURI().getPath();
-
-        try {
-            switch (metodo) {
-                case "GET" -> {
-                    if (path.matches("/accounts/\\d+")) {
-                        findById(exchange, extrairId(path));
-                    } else {
-                        findAll(exchange);
-                    }
-                }
-                case "POST" -> {
-                    if (path.matches("/accounts/\\d+/deposit")) {
-                        deposit(exchange, extrairId(path));
-                    } else if (path.matches("/accounts/\\d+/withdraw")) {
-                        withdraw(exchange, extrairId(path));
-                    } else {
-                        insert(exchange);
-                    }
-                }
-                case "PUT" -> update(exchange, extrairId(path));
-                case "DELETE" -> delete(exchange, extrairId(path));
-                default -> responderJson(exchange, "{\"erro\": \"Método não suportado\"}", 400);
-            }
-        } catch (Exception e) {
-            responderJson(exchange, "{\"erro\": \"" + e.getMessage() + "\"}", 400);
-        }
-    }
-
-    private Long extrairId(String path) {
-        String[] parts = path.split("/");
-        return Long.parseLong(parts[2]);
-    }
-
-    private String toJson(AccountResponseDTO dto) {
-        return gson.toJson(dto);
-    }
-
-    private String toJsonList(List<AccountResponseDTO> list) {
-        return gson.toJson(list);
-    }
-
-    private AccountRequestDTO parseAccountRequestDTO(String body) {
-        return gson.fromJson(body, AccountRequestDTO.class);
-    }
-
-    private void responderJson(HttpExchange exchange, String resposta, Integer statusCode) throws IOException {
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        exchange.sendResponseHeaders(statusCode, resposta.getBytes().length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(resposta.getBytes());
-        os.close();
+    @PatchMapping("/{id}/withdraw")
+    public void withdraw(@PathVariable Long id, @RequestParam BigDecimal value) {
+        accountService.withdraw(id, value);
     }
 }

@@ -2,6 +2,7 @@ package br.com.lucasvicente.contabancaria.controller;
 
 import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountResponseDTO;
 import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.AmountDTO.AmountRequestDTO;
 import br.com.lucasvicente.contabancaria.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -47,12 +48,12 @@ public class AccountController {
     }
 
     @PatchMapping("/{id}/deposit")
-    public void deposit (@PathVariable Long id, @RequestParam BigDecimal value) {
-        accountService.deposit(id, value);
+    public void deposit (@PathVariable Long id, @RequestBody AmountRequestDTO dto) {
+        accountService.deposit(id, dto.amount());
     }
 
     @PatchMapping("/{id}/withdraw")
-    public void withdraw(@PathVariable Long id, @RequestParam BigDecimal value) {
-        accountService.withdraw(id, value);
+    public void withdraw(@PathVariable Long id, @RequestBody AmountRequestDTO dto) {
+        accountService.withdraw(id, dto.amount());
     }
 }

@@ -1,6 +1,6 @@
 package br.com.lucasvicente.contabancaria.service;
 
-import br.com.lucasvicente.contabancaria.dao.*;
+import br.com.lucasvicente.contabancaria.repository.*;
 import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountResumeDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResumeDTO;
 import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyRequestDTO;

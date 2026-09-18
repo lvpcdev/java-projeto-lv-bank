@@ -1,4 +1,4 @@
-package br.com.lucasvicente.contabancaria.dao;
+package br.com.lucasvicente.contabancaria.repository;
 
 import br.com.lucasvicente.contabancaria.entites.PixKey;
 import org.springframework.data.jpa.repository.JpaRepository;

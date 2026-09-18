@@ -17,15 +17,15 @@ import java.util.List;
 
 @Service
 public class AccountService {
-    private final PixKeyDao pixKeyDao = new PixKeyDao();
-
 
     private final AccountRepository accountRepository;
     private final PersonRepository personRepository;
+    private final PixKeyRepository pixKeyRepository;
 
-    public AccountService(AccountRepository accountRepository, PersonRepository personRepository) {
+    public AccountService(AccountRepository accountRepository, PersonRepository personRepository, PixKeyRepository pixKeyRepository) {
         this.accountRepository = accountRepository;
         this.personRepository = personRepository;
+        this.pixKeyRepository = pixKeyRepository;
     }
 
     public List<AccountResponseDTO> findAll() {
@@ -96,7 +96,7 @@ public class AccountService {
 
     private AccountResponseDTO toDTO(Account account) {
 
-        List<PixKey> pixKeys = pixKeyDao.findAllByAccountId(account.getId());
+        List<PixKey> pixKeys = pixKeyRepository.findAllByAccountId(account.getId());
 
         List<PixKeyResumeDTO> pixKeyDTOs = pixKeys.stream()
                 .map(pk -> new PixKeyResumeDTO(pk.getId(), pk.getKeyValue()))

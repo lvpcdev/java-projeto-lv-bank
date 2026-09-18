@@ -1,7 +1,7 @@
 package br.com.lucasvicente.contabancaria.controller;
 
-import br.com.lucasvicente.contabancaria.dto.requests.PixKeyRequestDTO;
-import br.com.lucasvicente.contabancaria.dto.responses.PixKeyResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyResponseDTO;
 import br.com.lucasvicente.contabancaria.service.PixKeyService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

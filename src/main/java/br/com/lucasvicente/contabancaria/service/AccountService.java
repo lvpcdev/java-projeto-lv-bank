@@ -1,10 +1,10 @@
 package br.com.lucasvicente.contabancaria.service;
 
 import br.com.lucasvicente.contabancaria.dao.*;
-import br.com.lucasvicente.contabancaria.dto.PersonResumeDTO;
-import br.com.lucasvicente.contabancaria.dto.PixKeyResumeDTO;
-import br.com.lucasvicente.contabancaria.dto.requests.AccountRequestDTO;
-import br.com.lucasvicente.contabancaria.dto.responses.AccountResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyResumeDTO;
+import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResumeDTO;
+import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountRequestDTO;
 import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.entites.PixKey;

@@ -1,7 +1,7 @@
 package br.com.lucasvicente.contabancaria.controller;
 
-import br.com.lucasvicente.contabancaria.dto.requests.AccountRequestDTO;
-import br.com.lucasvicente.contabancaria.dto.responses.AccountResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountRequestDTO;
 import br.com.lucasvicente.contabancaria.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

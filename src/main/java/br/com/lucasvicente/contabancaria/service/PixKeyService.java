@@ -1,10 +1,10 @@
 package br.com.lucasvicente.contabancaria.service;
 
 import br.com.lucasvicente.contabancaria.dao.*;
-import br.com.lucasvicente.contabancaria.dto.AccountResumeDTO;
-import br.com.lucasvicente.contabancaria.dto.PersonResumeDTO;
-import br.com.lucasvicente.contabancaria.dto.requests.PixKeyRequestDTO;
-import br.com.lucasvicente.contabancaria.dto.responses.PixKeyResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountResumeDTO;
+import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResumeDTO;
+import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Account;
 import br.com.lucasvicente.contabancaria.entites.PixKey;
 import org.springframework.stereotype.Service;

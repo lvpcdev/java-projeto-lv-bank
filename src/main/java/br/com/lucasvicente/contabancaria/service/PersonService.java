@@ -1,7 +1,7 @@
 package br.com.lucasvicente.contabancaria.service;
 import br.com.lucasvicente.contabancaria.dao.PersonRepository;
-import br.com.lucasvicente.contabancaria.dto.requests.PersonRequestDTO;
-import br.com.lucasvicente.contabancaria.dto.responses.PersonResponseDTO;
+import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Person;
 import org.springframework.stereotype.Service;
 

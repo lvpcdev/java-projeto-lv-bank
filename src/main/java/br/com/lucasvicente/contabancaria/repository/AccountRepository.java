@@ -30,4 +30,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
                     "WHERE id = :accountId"
     )
     void withdraw(@Param("accountId") Long accountId, @Param("value") BigDecimal value);
+
+    @Query(
+            "SELECT a.id " +
+                    "FROM Account a " +
+                    "JOIN a.pixKeys p " +
+                    "WHERE p.keyValue = :pixKey"
+    )
+    Long findAccountByPixKey(@Param("pixKey") String pixKey);
 }

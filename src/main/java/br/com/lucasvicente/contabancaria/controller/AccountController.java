@@ -56,4 +56,9 @@ public class AccountController {
     public void withdraw(@PathVariable Long id, @RequestBody AmountRequestDTO dto) {
         accountService.withdraw(id, dto.amount());
     }
+
+    @PatchMapping("/sendpix/{issuerId}/{receiverPixKey}")
+    public void sendPix(@PathVariable String receiverPixKey,@PathVariable Long issuerId, @RequestBody AmountRequestDTO dto) {
+        accountService.sendPix(receiverPixKey, issuerId, dto.amount());
+    }
 }

@@ -10,6 +10,7 @@ import br.com.lucasvicente.contabancaria.entites.Person;
 import br.com.lucasvicente.contabancaria.entites.PixKey;
 import br.com.lucasvicente.contabancaria.exceptions.InsufficientBalanceException;
 import br.com.lucasvicente.contabancaria.exceptions.NegativeValueException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -92,6 +93,19 @@ public class AccountService {
         } else {
             accountRepository.withdraw(accountId, value);
         }
+    }
+
+    @Transactional
+    public void sendPix(String receiverPixKey, Long issuerId, BigDecimal value) {
+        Long receiverId = accountRepository.findAccountByPixKey(receiverPixKey);
+
+        if (receiverId == null) {
+            throw new IllegalArgumentException("Chave pix não encontrada");
+        }
+
+        withdraw(issuerId, value);
+
+        deposit(receiverId, value);
     }
 
     private AccountResponseDTO toDTO(Account account) {

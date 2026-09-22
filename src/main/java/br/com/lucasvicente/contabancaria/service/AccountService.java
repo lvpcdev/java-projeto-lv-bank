@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class AccountService {
@@ -45,9 +46,18 @@ public class AccountService {
         Person existsPerson = personRepository.findById(dto.personId())
                 .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada."));
 
+        int min = 100000;
+        int max = 999999;
+        int generatedNumber;
+
+        do{
+            generatedNumber = ThreadLocalRandom.current().nextInt(min, max+1);
+        } while (accountRepository.existsAccountByAccountNumber(generatedNumber));
+
+
         Account account = new Account();
         account.setPerson(existsPerson);
-        account.setAccountNumber(dto.accountNumber());
+        account.setAccountNumber(generatedNumber);
         account.setPassword(dto.password());
         account.setAgency(dto.agency());
         account.setBalance(BigDecimal.ZERO);

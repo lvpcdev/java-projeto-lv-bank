@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
+    boolean existsAccountByAccountNumber(Integer accountNumber);
+
     @Modifying
     @Transactional
     @Query(

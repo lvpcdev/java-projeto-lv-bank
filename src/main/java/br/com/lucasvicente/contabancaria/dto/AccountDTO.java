@@ -10,7 +10,6 @@ public final class AccountDTO {
             Long personId,
             String password,
             BigDecimal balance,
-            Integer accountNumber,
             String agency
     ) {}
     public record AccountResponseDTO (

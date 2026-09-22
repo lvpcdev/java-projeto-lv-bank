@@ -8,9 +8,7 @@ import br.com.lucasvicente.contabancaria.dto.PixKeyDTO.PixKeyResumeDTO;
 public final class AccountDTO {
     public record AccountRequestDTO(
             Long personId,
-            String password,
-            BigDecimal balance,
-            String agency
+            String password
     ) {}
     public record AccountResponseDTO (
             Long id,

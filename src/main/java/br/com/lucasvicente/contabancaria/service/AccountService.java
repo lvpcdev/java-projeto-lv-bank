@@ -59,7 +59,7 @@ public class AccountService {
         account.setPerson(existsPerson);
         account.setAccountNumber(generatedNumber);
         account.setPassword(dto.password());
-        account.setAgency(dto.agency());
+        account.setAgency("0001");
         account.setBalance(BigDecimal.ZERO);
 
 

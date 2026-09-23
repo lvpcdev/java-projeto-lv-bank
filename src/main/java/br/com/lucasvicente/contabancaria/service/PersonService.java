@@ -1,4 +1,5 @@
 package br.com.lucasvicente.contabancaria.service;
+import br.com.lucasvicente.contabancaria.dto.ChangePasswordDTO.ChangePasswordRequestDTO;
 import br.com.lucasvicente.contabancaria.repository.PersonRepository;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
@@ -26,11 +27,18 @@ public class PersonService {
     }
 
     public PersonResponseDTO insert(PersonRequestDTO dto) {
-
+        Person existingPerson = personRepository.findByCpf(dto.cpf());
+        if (existingPerson != null) {
+            if (!dto.password().equals(existingPerson.getPassword())) {
+                throw new IllegalArgumentException("Senha incorreta para o CPF informado");
+            }
+            return toDTO(existingPerson);
+        }
         Person person = new Person();
-
         person.setFullName(dto.fullName());
         person.setCpf(dto.cpf());
+        person.setPassword(dto.password());
+
 
         return toDTO(personRepository.save(person));
     }
@@ -43,12 +51,11 @@ public class PersonService {
         personRepository.deleteById(existsPerson.getId());
     }
 
-    public PersonResponseDTO update(Long id, PersonRequestDTO dto) {
+    public PersonResponseDTO changePassword(Long id, ChangePasswordRequestDTO dto) {
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada."));
 
-        existingPerson.setCpf(dto.cpf());
-        existingPerson.setFullName(dto.fullName());
+        existingPerson.setPassword(dto.newPassword());
 
         return toDTO(personRepository.save(existingPerson));
     }

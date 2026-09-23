@@ -58,7 +58,6 @@ public class AccountService {
         Account account = new Account();
         account.setPerson(existsPerson);
         account.setAccountNumber(generatedNumber);
-        account.setPassword(dto.password());
         account.setAgency("0001");
         account.setBalance(BigDecimal.ZERO);
 
@@ -71,15 +70,6 @@ public class AccountService {
                 .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada."));
 
         accountRepository.deleteById(existsAccount.getId());
-    }
-
-    public AccountResponseDTO update(Long id, AccountRequestDTO dto) {
-        Account existingAccount = accountRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada."));
-
-        existingAccount.setPassword(dto.password());
-
-        return toDTO(accountRepository.save(existingAccount));
     }
 
     public void deposit(Long accountId, BigDecimal value) throws NegativeValueException {

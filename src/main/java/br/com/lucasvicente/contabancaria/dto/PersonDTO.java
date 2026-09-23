@@ -3,7 +3,8 @@ package br.com.lucasvicente.contabancaria.dto;
 public final class PersonDTO {
     public record PersonRequestDTO(
             String fullName,
-            String cpf
+            String cpf,
+            String password
     ) {}
     public record PersonResponseDTO(
             Long id,

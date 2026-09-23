@@ -15,6 +15,7 @@ public class Person {
     private Long id;
     private String fullName;
     private String cpf;
+    private String password;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts = new ArrayList<>();
@@ -23,14 +24,12 @@ public class Person {
 
     }
 
-    public Person(Long id, String fullName, String cpf) {
-        this.id = id;
+    public Person(String fullName, String cpf, String password, List<Account> accounts) {
         this.fullName = fullName;
         this.cpf = cpf;
+        this.password = password;
+        this.accounts = accounts;
     }
-
-
-
 
     public String getFullName() {
         return fullName;
@@ -54,6 +53,14 @@ public class Person {
 
     public void addAccount (Account account) {
         this.accounts.add(account);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Long getId() {

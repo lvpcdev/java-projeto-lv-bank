@@ -18,7 +18,6 @@ public class Account {
     @JoinColumn(name = "person_id")
     private Person person;
 
-    private String password;
     private BigDecimal balance;
     private Integer accountNumber;
     private String agency;
@@ -30,10 +29,9 @@ public class Account {
         this.balance = new BigDecimal("0.0");
     }
 
-    public Account(Long id, Person person, String password, Integer accountNumber, String agency) {
+    public Account(Long id, Person person, Integer accountNumber, String agency) {
         this.id = id;
         this.person = person;
-        this.password = password;
         this.accountNumber = accountNumber;
         this.agency = agency;
         this.balance = new BigDecimal("0.0");
@@ -54,15 +52,6 @@ public class Account {
 
     public void setPerson(Person person) {
         this.person = person;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getAgency() {

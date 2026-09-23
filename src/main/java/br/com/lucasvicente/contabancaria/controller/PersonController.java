@@ -1,5 +1,6 @@
 package br.com.lucasvicente.contabancaria.controller;
 
+import br.com.lucasvicente.contabancaria.dto.ChangePasswordDTO.ChangePasswordRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.service.PersonService;
@@ -35,9 +36,9 @@ public class PersonController{
         return personService.insert(dto);
     }
 
-    @PutMapping("/{id}")
-    public PersonResponseDTO update (@PathVariable Long id, @Valid @RequestBody PersonRequestDTO dto) {
-        return personService.update(id, dto);
+    @PatchMapping("/{id}/password")
+    public PersonResponseDTO changePassword (@PathVariable Long id, @Valid @RequestBody ChangePasswordRequestDTO dto) {
+        return personService.changePassword(id, dto);
     }
 
     @DeleteMapping("/{id}")

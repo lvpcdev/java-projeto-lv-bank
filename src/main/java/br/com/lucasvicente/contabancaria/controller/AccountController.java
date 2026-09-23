@@ -35,11 +35,6 @@ public class AccountController {
         return accountService.insert(dto);
     }
 
-    @PutMapping("/{id}")
-    public AccountResponseDTO update (@PathVariable Long id, @Valid @RequestBody AccountRequestDTO dto) {
-        return accountService.update(id, dto);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         accountService.delete(id);

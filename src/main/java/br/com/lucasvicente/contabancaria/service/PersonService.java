@@ -4,6 +4,7 @@ import br.com.lucasvicente.contabancaria.repository.PersonRepository;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Person;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.List;
 @Service
 public class PersonService {
     private final PersonRepository personRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public PersonService(PersonRepository personRepository) {
+    public PersonService(PersonRepository personRepository, PasswordEncoder passwordEncoder) {
         this.personRepository = personRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<PersonResponseDTO> findAll() {
@@ -29,7 +32,7 @@ public class PersonService {
     public PersonResponseDTO insert(PersonRequestDTO dto) {
         Person existingPerson = personRepository.findByCpf(dto.cpf());
         if (existingPerson != null) {
-            if (!dto.password().equals(existingPerson.getPassword())) {
+            if (!passwordEncoder.matches(dto.password(), existingPerson.getPassword())) {
                 throw new IllegalArgumentException("Senha incorreta para o CPF informado");
             }
             return toDTO(existingPerson);
@@ -37,8 +40,7 @@ public class PersonService {
         Person person = new Person();
         person.setFullName(dto.fullName());
         person.setCpf(dto.cpf());
-        person.setPassword(dto.password());
-
+        person.setPassword(passwordEncoder.encode(dto.password()));
 
         return toDTO(personRepository.save(person));
     }
@@ -55,7 +57,7 @@ public class PersonService {
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada."));
 
-        existingPerson.setPassword(dto.newPassword());
+        existingPerson.setPassword(passwordEncoder.encode(dto.newPassword()));
 
         return toDTO(personRepository.save(existingPerson));
     }

@@ -1,5 +1,6 @@
 package br.com.lucasvicente.contabancaria.service;
 import br.com.lucasvicente.contabancaria.dto.ChangePasswordDTO.ChangePasswordRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.LoginDTO.LoginRequestDTO;
 import br.com.lucasvicente.contabancaria.repository.PersonRepository;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
@@ -60,6 +61,18 @@ public class PersonService {
         existingPerson.setPassword(passwordEncoder.encode(dto.newPassword()));
 
         return toDTO(personRepository.save(existingPerson));
+    }
+
+    public PersonResponseDTO login(LoginRequestDTO dto) {
+        Person existingPerson = personRepository.findByCpf(dto.cpf());
+
+        if (existingPerson == null) throw new IllegalArgumentException("Pessoa não encontrada.");
+
+        if (passwordEncoder.matches(dto.password(), existingPerson.getPassword())) {
+            return toDTO(existingPerson);
+        } else {
+            throw new IllegalArgumentException("Senha inválida");
+        }
     }
 
     public PersonResponseDTO toDTO(Person person) {

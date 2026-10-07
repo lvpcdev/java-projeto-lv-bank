@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -27,7 +26,9 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public AccountResponseDTO findById(@PathVariable Long id) {
+    public AccountResponseDTO findById(@PathVariable Long id, Authentication authentication) {
+        Long loggedPersonId = (Long) authentication.getPrincipal();
+        accountService.checkOwner(id, loggedPersonId);
         return accountService.findById(id);
     }
 
@@ -37,14 +38,18 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
+        Long loggedPersonId = (Long) authentication.getPrincipal();
+        accountService.checkOwner(id, loggedPersonId);
         accountService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/deposit")
-    public void deposit (@PathVariable Long id, @RequestBody AmountRequestDTO dto) {
+    public void deposit (@PathVariable Long id, @RequestBody AmountRequestDTO dto, Authentication authentication) {
+        Long loggedPersonId = (Long) authentication.getPrincipal();
+        accountService.checkOwner(id, loggedPersonId);
         accountService.deposit(id, dto.amount());
     }
 
@@ -56,7 +61,9 @@ public class AccountController {
     }
 
     @PatchMapping("/sendpix/{issuerId}/{receiverPixKey}")
-    public void sendPix(@PathVariable String receiverPixKey,@PathVariable Long issuerId, @RequestBody AmountRequestDTO dto) {
+    public void sendPix(@PathVariable String receiverPixKey,@PathVariable Long issuerId, @RequestBody AmountRequestDTO dto, Authentication authentication) {
+        Long loggedPersonId = (Long) authentication.getPrincipal();
+        accountService.checkOwner(issuerId, loggedPersonId);
         accountService.sendPix(receiverPixKey, issuerId, dto.amount());
     }
 }

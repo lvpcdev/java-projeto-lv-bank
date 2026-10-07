@@ -5,6 +5,7 @@ import br.com.lucasvicente.contabancaria.dto.AccountDTO.AccountRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.AmountDTO.AmountRequestDTO;
 import br.com.lucasvicente.contabancaria.service.AccountService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +49,9 @@ public class AccountController {
     }
 
     @PatchMapping("/{id}/withdraw")
-    public void withdraw(@PathVariable Long id, @RequestBody AmountRequestDTO dto) {
+    public void withdraw(@PathVariable Long id, @RequestBody AmountRequestDTO dto, Authentication authentication) {
+        Long loggedPersonId = (Long) authentication.getPrincipal();
+        accountService.checkOwner(id, loggedPersonId);
         accountService.withdraw(id, dto.amount());
     }
 

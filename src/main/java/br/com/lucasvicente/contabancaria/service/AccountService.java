@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -127,5 +128,14 @@ public class AccountService {
                 account.getAgency(),
                 pixKeyDTOs
         );
+    }
+
+    public void checkOwner(Long accountId, Long loggedPersonId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Conta não encontrada."));
+
+        if (!account.getPerson().getId().equals(loggedPersonId)) {
+            throw new AccessDeniedException("Você não tem permissão para acessar esta conta.");
+        }
     }
 }

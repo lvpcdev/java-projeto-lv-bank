@@ -2,6 +2,7 @@ package br.com.lucasvicente.contabancaria.controller;
 
 import br.com.lucasvicente.contabancaria.dto.ChangePasswordDTO.ChangePasswordRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.LoginDTO.LoginRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonLoginResponseDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.service.PersonService;
@@ -50,7 +51,7 @@ public class PersonController{
     }
 
     @PostMapping("/login")
-    public PersonResponseDTO login(@Valid @RequestBody LoginRequestDTO dto) {
+    public PersonLoginResponseDTO login(@Valid @RequestBody LoginRequestDTO dto) {
         return personService.login(dto);
     }
 }

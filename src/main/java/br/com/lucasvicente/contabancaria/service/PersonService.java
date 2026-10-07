@@ -1,10 +1,12 @@
 package br.com.lucasvicente.contabancaria.service;
 import br.com.lucasvicente.contabancaria.dto.ChangePasswordDTO.ChangePasswordRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.LoginDTO.LoginRequestDTO;
+import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonLoginResponseDTO;
 import br.com.lucasvicente.contabancaria.repository.PersonRepository;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonRequestDTO;
 import br.com.lucasvicente.contabancaria.dto.PersonDTO.PersonResponseDTO;
 import br.com.lucasvicente.contabancaria.entites.Person;
+import br.com.lucasvicente.contabancaria.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +16,12 @@ import java.util.List;
 public class PersonService {
     private final PersonRepository personRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public PersonService(PersonRepository personRepository, PasswordEncoder passwordEncoder) {
+    public PersonService(PersonRepository personRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public List<PersonResponseDTO> findAll() {
@@ -63,13 +67,18 @@ public class PersonService {
         return toDTO(personRepository.save(existingPerson));
     }
 
-    public PersonResponseDTO login(LoginRequestDTO dto) {
+    public PersonLoginResponseDTO login(LoginRequestDTO dto) {
         Person existingPerson = personRepository.findByCpf(dto.cpf());
 
         if (existingPerson == null) throw new IllegalArgumentException("Pessoa não encontrada.");
 
         if (passwordEncoder.matches(dto.password(), existingPerson.getPassword())) {
-            return toDTO(existingPerson);
+            return new PersonLoginResponseDTO(
+                    existingPerson.getId(),
+                    existingPerson.getFullName(),
+                    existingPerson.getCpf(),
+                    jwtService.generateToken(existingPerson.getId())
+            );
         } else {
             throw new IllegalArgumentException("Senha inválida");
         }

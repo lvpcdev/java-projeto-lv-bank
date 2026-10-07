@@ -15,5 +15,10 @@ public final class PersonDTO {
             Long id,
             String fullName
     ){}
-
+    public record PersonLoginResponseDTO(
+            Long id,
+            String fullName,
+            String cpf,
+            String token
+    ) {}
 }
